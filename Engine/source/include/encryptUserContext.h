@@ -16,4 +16,8 @@
 
 struct SUserStruct {
 	// Here add your custom information needed in the decrypter
+	unsigned int init_key;
+	unsigned int update_key;
+	unsigned int xor_key;
+	unsigned int pos;
 };

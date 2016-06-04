@@ -31,11 +31,28 @@
 #include "RemoteDebugger.hpp"
 #pragma comment(lib, "rdbglua52dll.lib")
 #else
-#pragma comment(lib, "lua52.lib")
 #endif
 
 #endif
 ;
+
+// Dirty hack to fix the PfGameService nil error
+int PfGameService(lua_State* L)
+{
+	lua_pushlstring(L, "", 0);
+	return 1;
+}
+
+int traceback (lua_State *L) {
+  const char *msg = lua_tostring(L, 1);
+  if (msg)
+    luaL_traceback(L, L, msg, 1);
+  else if (!lua_isnoneornil(L, 1)) {  /* is there an error object? */
+    if (!luaL_callmeta(L, 1, "__tostring"))  /* try its 'tostring' metamethod */
+      lua_pushliteral(L, "(no error message)");
+  }
+  return 1;
+}
 
 CKLBLuaEnv::CKLBLuaEnv()
 : m_L               (NULL)
@@ -155,6 +172,10 @@ CKLBLuaEnv::setupLuaEnv()
 
     // ライブラリをフルセット読み込む
     luaL_openlibs(m_L);
+
+	// Setup PfGame_Service fix
+	lua_pushcfunction(m_L, &PfGameService);
+	lua_setglobal(m_L, "PfGame_Service");
     
 	// 全てに先駆けて、NULL を定義する
 	lua_pushlightuserdata(m_L, 0);
@@ -571,7 +592,10 @@ CKLBLuaEnv::loadScript(const char *scriptUrl)
 #endif
 
     //　グローバル域を実行
-	result = lua_pcall(m_L, 0, 0, 0);
+	lua_pushcfunction(m_L, &traceback);
+	lua_insert(m_L, 1);
+	result = lua_pcall(m_L, 0, 0, 1);
+	lua_remove(m_L, 1);
 
 	if(result) {
     	const char * msg = NULL;
@@ -795,7 +819,10 @@ CKLBLuaEnv::includefile(lua_State * L)
     
     //　グローバル域を実行
 	MEASURE_THREAD_CPU_BEGIN(TASKTYPE_LUA_EXEC);
-	result = lua_pcall(L, 0, 0, 0);
+	lua_pushcfunction(L, &traceback);
+	lua_insert(L, 1);
+	result = lua_pcall(L, 0, 0, 1);
+	lua_remove(L, 1);
 	MEASURE_THREAD_CPU_END(TASKTYPE_LUA_EXEC);
 	bool bRet = true;
 	if(result) {
@@ -816,6 +843,7 @@ CKLBLuaEnv::includefile(lua_State * L)
 		klb_assertAlways("%s", buf);
 		bRet = false;
     }
+	lua_pop(L, 1); // traceback
 
 	lua.retBoolean(bRet);
 	return 1;

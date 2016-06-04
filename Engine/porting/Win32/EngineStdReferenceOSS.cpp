@@ -29,6 +29,7 @@
 #include "CKLBPauseCtrl.h"
 
 // Net Task
+#include "CKLBNetAPI.h"
 #include "CKLBStoreService.h"
 
 // UI Task
@@ -77,6 +78,7 @@ bool EngineTaskReference()
 	bResult = bResult && getFactoryFunc<CKLBAsyncFilecopy>();
 
 	// Net Task
+	bResult = bResult && getFactoryFunc<CKLBNetAPI>();
 	bResult = bResult && getFactoryFunc<CKLBStoreService>();
 	bResult = bResult && getFactoryFunc<CKLBUpdate>();
 	bResult = bResult && getFactoryFunc<CKLBUpdateZip>();

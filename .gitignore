@@ -34,6 +34,16 @@ __MACOSX/
 xcuserdata/
 project.xcworkspace/
 
+# Windows
+/Engine/porting/Win32/Debug/
+/Engine/porting/Win32/Release/
+/Engine/porting/Win32/Output/
+/Engine/porting/Win32/OSSGameLibraryWin32.opensdf
+/Engine/porting/Win32/OSSGameLibraryWin32.sdf
+/Engine/porting/Win32/SampleProject/Debug/
+/Engine/porting/Win32/SampleProject/Release/
+/Engine/porting/Win32/ipch/
+
 # object files things
 *.exe
 *.pdb

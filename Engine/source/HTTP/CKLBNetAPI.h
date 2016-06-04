@@ -33,15 +33,24 @@ enum {
 	// メッセージ値定義
 	NETAPIMSG_CONNECTION_CANCELED	= -999,	// セッションはキャンセルされた
 	NETAPIMSG_CONNECTION_FAILED		= -500,	// 接続に失敗した
-	RESERVED						= -1,	// サーバにアクセスできない/サーバからのパケットを解釈できない
-	NETAPIMSG_SERVER_TIMEOUT		= -2,	// サーバとの通信がタイムアウトした
-	NETAPIMSG_SERVER_ERROR			= 0,
-	NETAPIMSG_REQUEST_SUCCESS		= 1,	// リクエスト成功ステータス
+	NETAPIMSG_INVITE_FAILED			= -200,
+	NETAPIMSG_STARTUP_FAILED		= -100,
+	NETAPIMSG_SERVER_TIMEOUT		= -4,	// サーバとの通信がタイムアウトした
+	NETAPIMSG_REQUEST_FAILED		= -3,
+	NETAPIMSG_LOGIN_FAILED			= -2,
+	NETAPIMSG_SERVER_ERROR			= -1,
+	NETAPIMSG_UNKNOWN				= 0,
+	NETAPIMSG_LOGIN_SUCCESS			= 2,
+	NETAPIMSG_REQUEST_SUCCESS		= 3,	// リクエスト成功ステータス
+	NETAPIMSG_STARTUP_SUCCESS		= 100,
+	NETAPIMSG_INVITE_SUCCESS		= 200,
 };
 
 // Native側からAPIタスクにコマンドを発行するためのsingleton.
 // 
 class CKLBNetAPI;
+
+bool KLBNetAPI_test_init(CKLBNetAPI* a,CKLBTask* b,const char* url,const char* name,const char* ver,const char* uv1,const char* uv2,unsigned int uv3,const char* uv4);
 
 /*!
 * \class CKLBNetAPI
@@ -52,6 +61,7 @@ class CKLBNetAPI;
 class CKLBNetAPI : public CKLBLuaTask
 {
 	friend class CKLBTaskFactory<CKLBNetAPI>;
+	friend bool KLBNetAPI_test_init(CKLBNetAPI* a,CKLBTask* b,const char* url,const char* name,const char* ver,const char* uv1,const char* uv2,unsigned int uv3,const char* uv4);
 private:
 	CKLBNetAPI();
 	virtual ~CKLBNetAPI();
@@ -62,12 +72,20 @@ public:
 	virtual u32 getClassID();
 	static CKLBNetAPI* create(	CKLBTask* pParentTask, 
 								const char * callback);
+	bool startUp(const char* loginID,const char* password,const char* invite,unsigned int timeout,unsigned int* session);
+	bool login(const char* loginID,const char* password,const char* invite,unsigned int timeout,unsigned int* session);
+	bool cancel(unsigned int uniq);
+	void cancelAll();
+	void debugHdr(bool debugflag);
+	bool sendHTTP(const char* apiURL, const char* json, unsigned int timeout, bool passVersionCheck, u32* session);
+	bool watchMaintenance(unsigned int timeout, u32* session);
+	void genCmdNumID(const char* body, int serial, char* buf);
 	void execute(u32 deltaT);
 	void die();
 
 	bool initScript(CLuaState& lua);
 	int commandScript(CLuaState& lua);
-private:
+//private:
 	CKLBHTTPInterface*		m_http;		// そのセッションで使用されている接続
 	u32						m_timeout;	// タイムアウト時間
 	u32						m_timestart;
@@ -81,7 +99,7 @@ private:
 	// HTTP通信で追加するヘッダの配列
 	const char			**	m_http_header_array;
 
-private:
+//private:
 	void freeHeader();
 	void freeJSonResult();
 
@@ -90,7 +108,7 @@ private:
 	CKLBJsonItem * getJsonTree(const char * json_string, u32 dataLen);
 	bool get_token(CKLBJsonItem * pRoot);
 
-public:
+//public:
 	bool cancel		();
 };
 
