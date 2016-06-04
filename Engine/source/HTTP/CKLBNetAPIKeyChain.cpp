@@ -28,6 +28,7 @@ CKLBNetAPIKeyChain::CKLBNetAPIKeyChain()
 , m_cKey    (NULL)
 , m_appID   (NULL)
 , m_userID  (NULL) 
+, m_URL		(NULL)
 {
 }
 
@@ -57,4 +58,6 @@ CKLBNetAPIKeyChain::release() {
 	m_appID		= NULL;
 	KLBDELETEA(m_userID);
 	m_userID	= NULL; // 2012.11.27  解放漏れがあったので修正
+	KLBDELETEA(m_URL);
+	m_URL		= NULL;
 }

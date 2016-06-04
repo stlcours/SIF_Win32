@@ -358,15 +358,11 @@ int GameEngineMain(int argc, _TCHAR* argv[])
 	  fprintf(stderr, "Error: %s\n", glewGetErrorString(err));
 	}
 	fprintf(stdout, "Status: Using GLEW %s\n", glewGetString(GLEW_VERSION));
-
-#define HEIGHT	(768)
-#define WIDTH	(1024)
-#define POS_X	(10)
-#define POS_Y	(10)
-//#define HEIGHT	(800)
-//#define WIDTH	(400)
-	int scrW	= WIDTH;
-	int scrH	= HEIGHT;
+	
+#define WIDTH	(960)
+#define HEIGHT	(640)
+	int scrW	= WIDTH + GetSystemMetrics(SM_CXSIZEFRAME) * 2;
+	int scrH	= HEIGHT + GetSystemMetrics(SM_CYSIZEFRAME) * 2 + GetSystemMetrics(SM_CYCAPTION);
 	
 	int fixedDelta = 0;
 
@@ -463,19 +459,11 @@ int GameEngineMain(int argc, _TCHAR* argv[])
 	RegisterClass( &wc );
 	
 	// create main window
-	hwnd = CreateWindow(
+	hwnd = CreateWindowExA(0,
 		"GameEngineGL", "Playground", 
 		WS_CAPTION | WS_POPUPWINDOW | WS_VISIBLE,
-		0, 0, 256, 256,
+		CW_USEDEFAULT, CW_USEDEFAULT, scrW, scrH,
 		NULL, NULL, hInstance, NULL );
-
-/*		"EngineGL", NULL,
-		WS_THICKFRAME|WS_DISABLED,
-		CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,
-		NULL, NULL, 
-		hInstance, 
-		NULL
-	);*/
 	
 	if (!hwnd)
 		return -1;
@@ -507,25 +495,23 @@ int GameEngineMain(int argc, _TCHAR* argv[])
 	// Window border hard coded
 	//area.right = scrW + 8;
 	//area.bottom = scrH + 27;
-	////area.right = GetSystemMetrics(SM_CXSCREEN);
-	////area.bottom = GetSystemMetrics(SM_CYSCREEN);
+	//area.right = GetSystemMetrics(SM_CXSCREEN);
+	//area.bottom = GetSystemMetrics(SM_CYSCREEN);
+	//SetWindowPos(hwnd, HWND_TOP,
+	//				area.left, area.top,
+	//				area.right, area.bottom,
+	//				SWP_NOMOVE);
+	/*
 	int addW = GetSystemMetrics(SM_CXSIZEFRAME) * 2;
 	int addH = GetSystemMetrics(SM_CYSIZEFRAME) * 2 + GetSystemMetrics(SM_CYCAPTION);
 	area.right = scrW + addW;
 	area.bottom = scrH + addH;
 	
-
-	/*
-	AdjustWindowRect(
-		&area,
-		WS_SYSMENU|WS_THICKFRAME|WS_DISABLED,
-		false
-	);*/
-
 	SetWindowPos(hwnd, HWND_TOP,
 					area.left, area.top,
 					area.right, area.bottom,
 					SWP_NOMOVE);
+	*/
 #endif
 
 	/* set as foreground window to give this app focus in case it doesn't have it */

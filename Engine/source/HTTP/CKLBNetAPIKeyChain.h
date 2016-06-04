@@ -97,6 +97,16 @@ public:
 		}
 		return m_userID;
 	}
+
+	inline const char* setURL(const char* a)
+	{
+		KLBDELETEA(m_URL);
+		if(a)
+			m_URL=CKLBUtility::copyString(a);
+		else
+			m_URL=NULL;
+		return m_URL;
+	}
     
     inline const char * getToken		() const { return m_token;	}
     inline const char * getRegion		() const { return m_region; }
@@ -104,6 +114,7 @@ public:
     inline const char * getConsumerKey	() const { return m_cKey;	}
     inline const char * getAppID		() const { return m_appID;	}
 	inline const char * getUserID		() const { return m_userID; }
+	inline const char * getURL			() const { return m_URL; }
 
 	inline int genCmdNumID(char * retBuf, const char * body, time_t timeStamp, int serial) {
 		sprintf(retBuf, "%s-%s.%d.%d",
@@ -120,6 +131,7 @@ private:
     const char      *   m_cKey;     // consumerKey
     const char      *   m_appID;    // Application ID
 	const char		*	m_userID;	// User-ID
+	const char* m_URL;
 };
 
 #endif

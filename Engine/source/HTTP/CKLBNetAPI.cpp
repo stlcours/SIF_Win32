@@ -26,30 +26,51 @@
 ;
 enum {
 	// Command Values定義
+	NETAPI_STARTUP,
+	NETAPI_LOGIN,
+	NETAPI_LOGOUT,
 	NETAPI_SEND,				// send JSON packet
 	NETAPI_CANCEL,				// selected session cancel.
-	NETAPI_BUSY,				// busy
+	NETAPI_CANCEL_ALL,
+	NETAPI_WATCH_MAINTENANCE,
+	NETAPI_DEBUG_HDR,
+	NETAPI_GEN_CMDNUMID,
 };
 
 static IFactory::DEFCMD cmd[] = {
-	{"NETAPI_SEND",				NETAPI_SEND		},
-    {"NETAPI_CANCEL",			NETAPI_CANCEL	},
-	{"NETAPI_BUSY",				NETAPI_BUSY		},
+	{"NETAPI_STARTUP",					NETAPI_STARTUP					},
+	{"NETAPI_LOGIN",					NETAPI_LOGIN					},
+	{"NETAPI_LOGOUT",					NETAPI_LOGOUT					},
+	{"NETAPI_SEND",						NETAPI_SEND						},
+    {"NETAPI_CANCEL",					NETAPI_CANCEL					},
+	{"NETAPI_CANCEL_ALL",				NETAPI_CANCEL_ALL				},
+	{"NETAPI_WATCH_MAINTENANCE",		NETAPI_WATCH_MAINTENANCE		},
+	{"NETAPI_DEBUG_HDR",				NETAPI_DEBUG_HDR				},
+	{"NETAPI_GEN_CMDNUMID",				NETAPI_GEN_CMDNUMID				},
 
 	//
 	// Callback constants
 	//
-	{"NETAPIMSG_CONNECTION_FAILED",	NETAPIMSG_CONNECTION_FAILED },
-	{"NETAPIMSG_SERVER_ERROR",		NETAPIMSG_SERVER_ERROR		},
-	{"NETAPIMSG_SERVER_TIMEOUT",	NETAPIMSG_SERVER_TIMEOUT	},
-	{"NETAPIMSG_REQUEST_SUCCESS",	NETAPIMSG_REQUEST_SUCCESS	},
+	{"NETAPIMSG_CONNECTION_CANCELED",	NETAPIMSG_CONNECTION_CANCELED	},
+	{"NETAPIMSG_CONNECTION_FAILED",		NETAPIMSG_CONNECTION_FAILED		},
+	{"NETAPIMSG_INVITE_FAILED",			NETAPIMSG_INVITE_FAILED			},
+	{"NETAPIMSG_STARTUP_FAILED",		NETAPIMSG_STARTUP_FAILED		},
+	{"NETAPIMSG_SERVER_TIMEOUT",		NETAPIMSG_SERVER_TIMEOUT		},
+	{"NETAPIMSG_REQUEST_FAILED",		NETAPIMSG_REQUEST_FAILED		},
+	{"NETAPIMSG_LOGIN_FAILED",			NETAPIMSG_LOGIN_FAILED			},
+	{"NETAPIMSG_SERVER_ERROR",			NETAPIMSG_SERVER_ERROR			},
+	{"NETAPIMSG_UNKNOWN",				NETAPIMSG_UNKNOWN				},
+	{"NETAPIMSG_LOGIN_SUCCESS",			NETAPIMSG_LOGIN_SUCCESS			},
+	{"NETAPIMSG_REQUEST_SUCCESS",		NETAPIMSG_REQUEST_SUCCESS		},
+	{"NETAPIMSG_STARTUP_SUCCESS",		NETAPIMSG_STARTUP_SUCCESS		},
+	{"NETAPIMSG_INVITE_SUCCESS",		NETAPIMSG_INVITE_SUCCESS		},
 	{0, 0}
 };
 
 static CKLBTaskFactory<CKLBNetAPI> factory("HTTP_API", CLS_KLBNETAPI, cmd);
 
 enum {
-	ARG_CALLBACK	= 1,
+	ARG_CALLBACK	= 5,
 	ARG_REQUIRE     = ARG_CALLBACK,
 };
 
@@ -192,8 +213,16 @@ bool
 CKLBNetAPI::initScript(CLuaState& lua)
 {
 	int argc = lua.numArgs();
+	lua.print_stack();
 
     if (argc < ARG_REQUIRE) { return false; }
+
+	CKLBNetAPIKeyChain& kc=CKLBNetAPIKeyChain::getInstance();
+	kc.setAppID(lua.getString(4));
+	kc.setClient(lua.getString(3));
+	kc.setURL(lua.getString(1));
+	kc.setRegion(lua.getString(7));
+	kc.setConsumernKey(lua.getString(2));
 
 	return init(NULL, lua.getString(ARG_CALLBACK));
 }
@@ -206,6 +235,13 @@ CKLBNetAPI::getJsonTree(const char * json_string, u32 dataLen)
 	return pRoot;
 }
 
+bool CKLBNetAPI::startUp(const char* user_id,const char* password,const char* uiv,unsigned int timeout,unsigned int* uiv2) {
+	CKLBNetAPIKeyChain& kc=CKLBNetAPIKeyChain::getInstance();
+	kc.setUserID(user_id);
+	kc.setConsumernKey(password);
+	return true;
+}
+
 int
 CKLBNetAPI::commandScript(CLuaState& lua)
 {
@@ -215,7 +251,7 @@ CKLBNetAPI::commandScript(CLuaState& lua)
 		lua.retBoolean(false);
 		return 1;
 	}
-
+	lua.print_stack();
 	int cmd = lua.getInt(2);
 	int ret = 1;
 
@@ -226,6 +262,24 @@ CKLBNetAPI::commandScript(CLuaState& lua)
 			lua.retBoolean(false);
 		}
 		break;
+	case NETAPI_STARTUP:
+		{
+			if(argc-4>=3) lua.retBoolean(false);
+			else {
+				const char* user_id=lua.getString(3);
+				const char* password=lua.getString(4);
+				const char* uiv=NULL;
+				int timeout=0;
+				unsigned int uiv2=0;
+
+				if(lua.getType(5)!=LUA_TNIL && argc>=5) uiv=lua.getString(5);
+				if(argc>=6) timeout=lua.getInt(6);
+
+				lua.retInt(1);
+				//startUp(user_id,password,uiv,timeout,&uiv2);
+			}
+		}
+		break;
 	case NETAPI_CANCEL:
 		{
 			if (m_http != NULL) {
@@ -234,12 +288,12 @@ CKLBNetAPI::commandScript(CLuaState& lua)
 			lua.retBoolean(m_http != NULL);
 		}
 		break;
-	case NETAPI_BUSY:
+	/*case NETAPI_BUSY:
 		{
 			// If object is alive, then it is busy.
 			lua.retBoolean(m_http != NULL);
 		}
-		break;
+		break;*/
 	case NETAPI_SEND:
 		{
 			//

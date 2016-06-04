@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug_Cpp|Win32">
       <Configuration>Debug_Cpp</Configuration>
@@ -28,7 +28,7 @@
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <CharacterSet>MultiByte</CharacterSet>
-    <PlatformToolset>v120</PlatformToolset>
+    <PlatformToolset>v100</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_CSharp|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
@@ -41,7 +41,7 @@
     <UseDebugLibraries>false</UseDebugLibraries>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
-    <PlatformToolset>v120</PlatformToolset>
+    <PlatformToolset>v100</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='Debug_Cpp|Win32'">
     <ConfigurationType>StaticLibrary</ConfigurationType>
@@ -81,7 +81,6 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
-      <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>TurnOffAllWarnings</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>CURL_STATICLIB;WIN32;FT_DEBUG_LEVEL_ERROR;FT_DEBUG_LEVEL_TRACE;FT2_BUILD_LIBRARY;_DEBUG;_CONSOLE;DEBUG_MEMORY_OFF;DEBUG_PERFORMANCE_OFF;DEBUG_LUAEDIT_OFF;DEBUG_RT_CHECK;DEBUG_MENU;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -147,7 +146,6 @@
   <ItemGroup>
     <None Include="..\..\source\Rendering\shaderSource.inl" />
     <None Include="Playground.ico" />
-    <None Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Projects\WorldTest\CWorldTask.h" />
@@ -166,31 +164,6 @@
     <ClInclude Include="..\..\libs\JSonParser\yajl_encode.h" />
     <ClInclude Include="..\..\libs\JSonParser\yajl_lex.h" />
     <ClInclude Include="..\..\libs\JSonParser\yajl_parser.h" />
-    <ClInclude Include="..\..\libs\lua\lapi.h" />
-    <ClInclude Include="..\..\libs\lua\lauxlib.h" />
-    <ClInclude Include="..\..\libs\lua\lcode.h" />
-    <ClInclude Include="..\..\libs\lua\lctype.h" />
-    <ClInclude Include="..\..\libs\lua\ldebug.h" />
-    <ClInclude Include="..\..\libs\lua\ldo.h" />
-    <ClInclude Include="..\..\libs\lua\lfunc.h" />
-    <ClInclude Include="..\..\libs\lua\lgc.h" />
-    <ClInclude Include="..\..\libs\lua\llex.h" />
-    <ClInclude Include="..\..\libs\lua\llimits.h" />
-    <ClInclude Include="..\..\libs\lua\lmem.h" />
-    <ClInclude Include="..\..\libs\lua\lobject.h" />
-    <ClInclude Include="..\..\libs\lua\lopcodes.h" />
-    <ClInclude Include="..\..\libs\lua\lparser.h" />
-    <ClInclude Include="..\..\libs\lua\lstate.h" />
-    <ClInclude Include="..\..\libs\lua\lstring.h" />
-    <ClInclude Include="..\..\libs\lua\ltable.h" />
-    <ClInclude Include="..\..\libs\lua\ltm.h" />
-    <ClInclude Include="..\..\libs\lua\lua.h" />
-    <ClInclude Include="..\..\libs\lua\lua.hpp" />
-    <ClInclude Include="..\..\libs\lua\luaconf.h" />
-    <ClInclude Include="..\..\libs\lua\lualib.h" />
-    <ClInclude Include="..\..\libs\lua\lundump.h" />
-    <ClInclude Include="..\..\libs\lua\lvm.h" />
-    <ClInclude Include="..\..\libs\lua\lzio.h" />
     <ClInclude Include="..\..\libs\minizip\crypt.h" />
     <ClInclude Include="..\..\libs\minizip\ioapi.h" />
     <ClInclude Include="..\..\libs\minizip\mztools.h" />
@@ -1270,6 +1243,38 @@
     <ClCompile Include="..\..\libs\JSonParser\yajl_parser.c" />
     <ClCompile Include="..\..\libs\JSonParser\yajl_tree.c" />
     <ClCompile Include="..\..\libs\JSonParser\yajl_version.c" />
+    <ClCompile Include="..\..\libs\lua\lapi.c" />
+    <ClCompile Include="..\..\libs\lua\lauxlib.c" />
+    <ClCompile Include="..\..\libs\lua\lbaselib.c" />
+    <ClCompile Include="..\..\libs\lua\lbitlib.c" />
+    <ClCompile Include="..\..\libs\lua\lcode.c" />
+    <ClCompile Include="..\..\libs\lua\lcorolib.c" />
+    <ClCompile Include="..\..\libs\lua\lctype.c" />
+    <ClCompile Include="..\..\libs\lua\ldblib.c" />
+    <ClCompile Include="..\..\libs\lua\ldebug.c" />
+    <ClCompile Include="..\..\libs\lua\ldo.c" />
+    <ClCompile Include="..\..\libs\lua\ldump.c" />
+    <ClCompile Include="..\..\libs\lua\lfunc.c" />
+    <ClCompile Include="..\..\libs\lua\lgc.c" />
+    <ClCompile Include="..\..\libs\lua\linit.c" />
+    <ClCompile Include="..\..\libs\lua\liolib.c" />
+    <ClCompile Include="..\..\libs\lua\llex.c" />
+    <ClCompile Include="..\..\libs\lua\lmathlib.c" />
+    <ClCompile Include="..\..\libs\lua\lmem.c" />
+    <ClCompile Include="..\..\libs\lua\loadlib.c" />
+    <ClCompile Include="..\..\libs\lua\lobject.c" />
+    <ClCompile Include="..\..\libs\lua\lopcodes.c" />
+    <ClCompile Include="..\..\libs\lua\loslib.c" />
+    <ClCompile Include="..\..\libs\lua\lparser.c" />
+    <ClCompile Include="..\..\libs\lua\lstate.c" />
+    <ClCompile Include="..\..\libs\lua\lstring.c" />
+    <ClCompile Include="..\..\libs\lua\lstrlib.c" />
+    <ClCompile Include="..\..\libs\lua\ltable.c" />
+    <ClCompile Include="..\..\libs\lua\ltablib.c" />
+    <ClCompile Include="..\..\libs\lua\ltm.c" />
+    <ClCompile Include="..\..\libs\lua\lundump.c" />
+    <ClCompile Include="..\..\libs\lua\lvm.c" />
+    <ClCompile Include="..\..\libs\lua\lzio.c" />
     <ClCompile Include="..\..\libs\minizip\ioapi.c" />
     <ClCompile Include="..\..\libs\minizip\mztools.c" />
     <ClCompile Include="..\..\libs\minizip\unzip.c" />
@@ -1449,6 +1454,21 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug_CSharp|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="zlib\adler32.c" />
+    <ClCompile Include="zlib\compress.c" />
+    <ClCompile Include="zlib\crc32.c" />
+    <ClCompile Include="zlib\deflate.c" />
+    <ClCompile Include="zlib\gzclose.c" />
+    <ClCompile Include="zlib\gzlib.c" />
+    <ClCompile Include="zlib\gzread.c" />
+    <ClCompile Include="zlib\gzwrite.c" />
+    <ClCompile Include="zlib\infback.c" />
+    <ClCompile Include="zlib\inffast.c" />
+    <ClCompile Include="zlib\inflate.c" />
+    <ClCompile Include="zlib\inftrees.c" />
+    <ClCompile Include="zlib\trees.c" />
+    <ClCompile Include="zlib\uncompr.c" />
+    <ClCompile Include="zlib\zutil.c" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="res.rc" />
