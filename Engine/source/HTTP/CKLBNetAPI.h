@@ -50,8 +50,6 @@ enum {
 // 
 class CKLBNetAPI;
 
-bool KLBNetAPI_test_init(CKLBNetAPI* a,CKLBTask* b,const char* url,const char* name,const char* ver,const char* uv1,const char* uv2,unsigned int uv3,const char* uv4);
-
 /*!
 * \class CKLBNetAPI
 * \brief Net API class.
@@ -72,7 +70,7 @@ public:
 	virtual u32 getClassID();
 	static CKLBNetAPI* create(	CKLBTask* pParentTask, 
 								const char * callback);
-	bool startUp(const char* loginID,const char* password,const char* invite,unsigned int timeout,unsigned int* session);
+	void set_header(CKLBHTTPInterface* http, const char* authorize_string);
 	bool login(const char* loginID,const char* password,const char* invite,unsigned int timeout,unsigned int* session);
 	bool cancel(unsigned int uniq);
 	void cancelAll();

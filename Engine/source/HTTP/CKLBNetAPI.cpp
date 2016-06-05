@@ -25,16 +25,16 @@
 
 ;
 enum {
-	// Command Values定義
-	NETAPI_STARTUP,
-	NETAPI_LOGIN,
-	NETAPI_LOGOUT,
+	// Command Values
+	NETAPI_STARTUP,				// start new account
+	NETAPI_LOGIN,				// login to account
+	NETAPI_LOGOUT,				// possibility unused
 	NETAPI_SEND,				// send JSON packet
-	NETAPI_CANCEL,				// selected session cancel.
-	NETAPI_CANCEL_ALL,
-	NETAPI_WATCH_MAINTENANCE,
-	NETAPI_DEBUG_HDR,
-	NETAPI_GEN_CMDNUMID,
+	NETAPI_CANCEL,				// selected session cancel
+	NETAPI_CANCEL_ALL,			// abort all connection
+	NETAPI_WATCH_MAINTENANCE,	// check for maintenance?
+	NETAPI_DEBUG_HDR,			// unknwon
+	NETAPI_GEN_CMDNUMID,		// create commandNum string in data
 };
 
 static IFactory::DEFCMD cmd[] = {
@@ -86,6 +86,7 @@ CKLBNetAPI::CKLBNetAPI()
 , m_http_header_array	(NULL)
 , m_http_header_length	(0)
 {
+	// Create the header array
 }
 
 CKLBNetAPI::~CKLBNetAPI() 
@@ -224,6 +225,9 @@ CKLBNetAPI::initScript(CLuaState& lua)
 	kc.setRegion(lua.getString(7));
 	kc.setConsumernKey(lua.getString(2));
 
+	// Request authentication key
+
+
 	return init(NULL, lua.getString(ARG_CALLBACK));
 }
 
@@ -235,11 +239,88 @@ CKLBNetAPI::getJsonTree(const char * json_string, u32 dataLen)
 	return pRoot;
 }
 
-bool CKLBNetAPI::startUp(const char* user_id,const char* password,const char* uiv,unsigned int timeout,unsigned int* uiv2) {
-	CKLBNetAPIKeyChain& kc=CKLBNetAPIKeyChain::getInstance();
-	kc.setUserID(user_id);
-	kc.setConsumernKey(password);
-	return true;
+// authorize_string ends with NULL
+void CKLBNetAPI::set_header(CKLBHTTPInterface* http, const char* authorize_string)
+{
+	/*
+	API-Model: straightforward
+	Application-ID: %s
+	Authorize: authorize_string
+	Bundle-Version: getBundleVersion()
+	Client-Version: %s
+	Debug: 1
+	OS: Win32
+	OS-Version: %s
+	Platform-Type: 0 or 3?
+	Region: %s
+	Time-Zone: %s
+	*/
+
+	// Basic vars
+	CPFInterface& pfif = CPFInterface::getInstance();
+	CKLBNetAPIKeyChain& kc = CKLBNetAPIKeyChain::getInstance();
+	const char* headers[12];
+	const char* os_info = pfif.platform().getPlatform();
+
+	// For values above
+	char* alldata = new char[1152];
+	char* os_data = alldata;
+	char* os_version = alldata + 128;
+	char* time_zone = alldata + 256;
+	char* application_id = time_zone + 128;
+	char* authorize = NULL; // Special
+	char* bundle_version = time_zone + 256;
+	char* client_version = bundle_version + 128;
+	char* region = bundle_version + 256;
+
+	// Process OS and timezone
+	{
+		char* temp_os_version;
+		char* temp_time_zone;
+		size_t os_info_len = strlen(os_info);
+
+		memcpy(os_data, os_info, os_info_len + 1);
+
+		for(; *os_data != ';'; os_data++) {}
+
+		*os_data = 0;
+		temp_os_version = ++os_data;
+
+		for(; *os_data != ';'; os_data++) {}
+		*os_data = 0;
+		temp_time_zone = ++os_data;
+
+		sprintf(os_version, "OS-Version: %s", temp_os_version);
+		sprintf(time_zone, "Time-Zone: %s", temp_time_zone);
+	}
+
+	// Process authorize string
+	authorize = new char[1024];
+
+	sprintf(authorize, "Authorize: %s", authorize_string);
+	sprintf(application_id, "Application-ID: %s", kc.getAppID());
+	sprintf(bundle_version, "Bundle-Version: %s", pfif.platform().getBundleVersion());
+	sprintf(client_version, "Client-Version: %s", kc.getClient());
+	sprintf(region, "Region: %s", kc.getRegion());
+
+	// Set header
+	headers[0] = "API-Model: straightforward";
+	headers[1] = application_id;
+	headers[2] = authorize;
+	headers[3] = bundle_version;
+	headers[4] = client_version;
+	headers[5] = "Debug: 1";
+	headers[6] = "OS: Win32";
+	headers[7] = os_version;
+	headers[8] = "Platform-Type: 3";
+	headers[9] = region;
+	headers[10] = time_zone;
+	headers[11] = NULL;
+
+	http->setHeader(headers);
+
+	delete[] authorize;
+	delete[] alldata;
 }
 
 int
@@ -257,30 +338,54 @@ CKLBNetAPI::commandScript(CLuaState& lua)
 
 	switch(cmd)
 	{
-	default:
+		default:
 		{
 			lua.retBoolean(false);
 		}
 		break;
-	case NETAPI_STARTUP:
+		case NETAPI_STARTUP:
 		{
+			// 3. login_key
+			// 4. login_passwd
+			// 5. invite
+			// 6. timeout
 			if(argc-4>=3) lua.retBoolean(false);
 			else {
-				const char* user_id=lua.getString(3);
-				const char* password=lua.getString(4);
-				const char* uiv=NULL;
-				int timeout=0;
-				unsigned int uiv2=0;
+				const char* user_id = lua.getString(3);
+				const char* password = lua.getString(4);
+				const char* invite = NULL;
+				int timeout = 30000;
+				unsigned int uiv2 = 0;
 
-				if(lua.getType(5)!=LUA_TNIL && argc>=5) uiv=lua.getString(5);
-				if(argc>=6) timeout=lua.getInt(6);
+				if(lua.getType(5) != LUA_TNIL && argc>=5) invite = lua.getString(5);
+				if(argc >= 6) timeout = lua.getInt(6);
+				
+				// Send request
+				CKLBHTTPInterface* http = NetworkManager::createConnection();
+				CKLBNetAPIKeyChain& kc = CKLBNetAPIKeyChain::getInstance();
+				http->reuse();
 
-				lua.retInt(1);
-				//startUp(user_id,password,uiv,timeout,&uiv2);
+				// Authorize string
+				{
+					char* auth = new char[1024];
+
+					sprintf(auth, "consumerKey=%s&timeStamp=%d&nonce=1&version=1.1", kc.getConsumerKey(), int(time(NULL)));
+					set_header(http, auth);
+
+					delete[] auth;
+				}
+
+				char url[MAX_PATH];
+				sprintf(url, "%s/login/authkey", kc.getURL());
+
+				m_http = http;
+				http->httpPOST(url, false);
+
+				lua.retBoolean(true);
 			}
 		}
 		break;
-	case NETAPI_CANCEL:
+		case NETAPI_CANCEL:
 		{
 			if (m_http != NULL) {
 				m_canceled = true;
@@ -288,13 +393,7 @@ CKLBNetAPI::commandScript(CLuaState& lua)
 			lua.retBoolean(m_http != NULL);
 		}
 		break;
-	/*case NETAPI_BUSY:
-		{
-			// If object is alive, then it is busy.
-			lua.retBoolean(m_http != NULL);
-		}
-		break;*/
-	case NETAPI_SEND:
+		case NETAPI_SEND:
 		{
 			//
 			// 3. URL

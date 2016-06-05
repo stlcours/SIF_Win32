@@ -39,7 +39,7 @@
 
 #include "FontRendering.h"
 
-bool CWin32Platform::g_useDecryption = false;
+bool CWin32Platform::g_useDecryption = true;
 
 void CWin32Platform::setEncrypt(bool encrypt) {
 	g_useDecryption = encrypt;
@@ -93,14 +93,27 @@ CWin32Platform::create_version_string()
 	memset(&tzInfo, 0, sizeof(TIME_ZONE_INFORMATION));
 	GetTimeZoneInformation(&tzInfo);
 
-	// Win32 APIは各国語でTimezone名を返すので、そこを何とかせんといかんのですが、
-	// どうするかは後で考えます。とりあえずこの場はJST固定で実装。
-
+	// The version string. Example result (with timezone): Win32;WinNT 5.1.2600/Service Pack 3;SE Standard Asia Time
 	sprintf(buf,
-			"Win32;%s %d.%d.%d/%s;JST",
+			"Win32;%s %d.%d.%d%s%s;",
 			OSlabel,
-			verInfo.dwMajorVersion, verInfo.dwMinorVersion, verInfo.dwBuildNumber,
+			verInfo.dwMajorVersion, verInfo.dwMinorVersion, verInfo.dwBuildNumber, verInfo.szCSDVersion[0] != 0 ? "/" : "",
 			verInfo.szCSDVersion);
+	
+	// Process the timezone from wchar_t to char
+	{
+		char* temp = KLBNEWA(char, 32);
+		char* converted_name = temp;
+		wchar_t* name = tzInfo.StandardName;
+
+		memset(temp, 0, 32);
+
+		for(; *name != 0; *converted_name++ = *name++) {}
+
+		sprintf(buf, "%s%s", buf, temp);
+
+		KLBDELETEA(temp);
+	}
 
 	int len = strlen(buf);
 
@@ -118,9 +131,11 @@ CWin32Platform::getPlatform()
 }
 
 u32 CWin32Platform::getPhysicalMemKB() {
-	// Do not want to mess with WMI (Windows Management Instrumentation)
-	// We will return a "virtual" 4 GB RAM memory computer.
-	return 4 << (10 + 10);
+	unsigned long long x = 0xFFFFFFFFULL;
+
+	klb_assert(GetPhysicallyInstalledSystemMemory(&x) == 1, "GetPhysicallyInstalledSystemMemory() failed");
+
+	return x / 1024;
 }
 
 void
@@ -139,7 +154,7 @@ CWin32Platform::detailedLogging(const char * /*basefile*/, const char * /*functi
 	const char * sjisStr = utf8toSJIS(log);
 
 	// 生成した文字列を何らかの方法で出力する
-	OutputDebugString(sjisStr);
+	OutputDebugStringA(sjisStr);
 	printf("%s", sjisStr);
 	delete [] sjisStr;
 }
@@ -177,9 +192,11 @@ CWin32Platform::nanotime()
 	return val;
 }
 
+#define LATEST_APK_VERSION "3.1.4"
+
 const char*
 CWin32Platform::getBundleVersion() {
-    return "0.0";
+	return LATEST_APK_VERSION;
 }
 
 bool CWin32Platform::useEncryption() {
