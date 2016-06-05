@@ -111,6 +111,8 @@ u32 CDecryptBaseClass::decryptSetup(const u8* ptr, const u8* hdr) {
 	MD5_Update(mctx, basename, basename_len);
 	MD5_Final(digest, mctx);
 
+	KLBDELETE(mctx);
+
 	if(memcmp(digest + 4, hdr, 4) == 0)
 	{
 		// OK. Version 2

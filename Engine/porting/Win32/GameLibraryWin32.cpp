@@ -359,10 +359,8 @@ int GameEngineMain(int argc, _TCHAR* argv[])
 	}
 	fprintf(stdout, "Status: Using GLEW %s\n", glewGetString(GLEW_VERSION));
 	
-#define WIDTH	(960)
-#define HEIGHT	(640)
-	int scrW	= WIDTH + GetSystemMetrics(SM_CXSIZEFRAME) * 2;
-	int scrH	= HEIGHT + GetSystemMetrics(SM_CYSIZEFRAME) * 2 + GetSystemMetrics(SM_CYCAPTION);
+	int WIDTH = 960;
+	int HEIGHT = 640;
 	
 	int fixedDelta = 0;
 
@@ -373,7 +371,7 @@ int GameEngineMain(int argc, _TCHAR* argv[])
 
 	g_fileName[0] = 0;
 
-	bool hasDefaultFont = true;
+	bool hasDefaultFont = false;
 	bool hasDefaultDB   = false;
 
 	if (argc > 1) {
@@ -382,11 +380,11 @@ int GameEngineMain(int argc, _TCHAR* argv[])
 		while (parse < max) {
 			if(*argv[parse] == '-') {
 				if (strcmp("-w",argv[parse]) == 0) {
-					sscanf_s(argv[parse+1],"%i",&scrW);
+					sscanf_s(argv[parse+1],"%i",&WIDTH);
 				}
 
 				if (strcmp("-h",argv[parse]) == 0) {
-					sscanf_s(argv[parse+1],"%i",&scrH);
+					sscanf_s(argv[parse+1],"%i",&HEIGHT);
 				}
 
 				if (strcmp("-i",argv[parse]) == 0) {
@@ -435,6 +433,12 @@ int GameEngineMain(int argc, _TCHAR* argv[])
 			}
 		}
 	}
+	RECT temp = {0, 0, WIDTH, HEIGHT};
+
+	AdjustWindowRect(&temp, WS_CAPTION | WS_VISIBLE | WS_MINIMIZEBOX | WS_SYSMENU, 0);
+
+	int scrW	= abs(temp.left) + temp.right;
+	int scrH	= abs(temp.top) + temp.bottom;
 
 	CWin32PathConv& pathconv = CWin32PathConv::getInstance();
 	pathconv.setPath(g_pathInstall, g_pathExtern);
@@ -461,7 +465,7 @@ int GameEngineMain(int argc, _TCHAR* argv[])
 	// create main window
 	hwnd = CreateWindowExA(0,
 		"GameEngineGL", "Playground", 
-		WS_CAPTION | WS_POPUPWINDOW | WS_VISIBLE,
+		WS_CAPTION | WS_VISIBLE | WS_MINIMIZEBOX | WS_SYSMENU,
 		CW_USEDEFAULT, CW_USEDEFAULT, scrW, scrH,
 		NULL, NULL, hInstance, NULL );
 	
@@ -544,7 +548,7 @@ int GameEngineMain(int argc, _TCHAR* argv[])
 	CWin32AudioMgr::getInstance().init(hwnd);
 
 	// set screen size
-	pfif.client().setScreenInfo(false, scrW, scrH);
+	pfif.client().setScreenInfo(false, WIDTH, HEIGHT);
 	// boot path
 	if (strlen(g_fileName)) {
 		pfif.client().setFilePath(g_fileName);

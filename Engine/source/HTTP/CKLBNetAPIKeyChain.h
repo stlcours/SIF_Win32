@@ -117,9 +117,8 @@ public:
 	inline const char * getURL			() const { return m_URL; }
 
 	inline int genCmdNumID(char * retBuf, const char * body, time_t timeStamp, int serial) {
-		sprintf(retBuf, "%s-%s.%d.%d",
-				body, m_token,
-				(int)timeStamp, serial);
+		sprintf(retBuf, "%s.%d.%d",
+				body, (int)timeStamp, serial);
 		int len = strlen(retBuf);
 		return len;
 	}
@@ -131,7 +130,7 @@ private:
     const char      *   m_cKey;     // consumerKey
     const char      *   m_appID;    // Application ID
 	const char		*	m_userID;	// User-ID
-	const char* m_URL;
+	const char		*	m_URL;		// URL point
 };
 
 #endif

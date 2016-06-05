@@ -23,6 +23,13 @@ GameSetup()
 
 	CPFInterface& pfif = CPFInterface::getInstance();
 	pfif.setClientRequest(pClient);
+
+	if(pfif.platform().registerFont("MotoyaLMaru W3 mono", "asset://MTLmr3m.ttf", true) == false)
+		klb_assertAlways("[LoveLive base] GAME FONT MTLmr3m.ttf NOT INSTALLED");
+
+	if(pfif.platform().registerFont("CurrencySymbols", "asset://CurrencySymbols.ttf", false) == false)
+		klb_assertAlways("[LoveLive base] GAME FONT CurrencySymbols.ttf NOT INSTALLED");
+
 	return true;
 }
 
