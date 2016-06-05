@@ -14,13 +14,16 @@
    limitations under the License.
 */
 #include "assert_klb.h"
+#include "CWin32Platform.h"
 #include <Windows.h>
 #include <stdio.h>
 
 void assertFunction(int line, const char* file, const char* msg,...) {
+	CWin32Platform& platform = dynamic_cast<CWin32Platform&>(CPFInterface::getInstance().platform());
 	va_list	argp;
 	char pszBuf [1024];
 	char log	[1024];
+	HWND hWnd = &platform ? platform.get_hWnd() : NULL;
 
 	va_start(argp, msg);
 	vsprintf_s( pszBuf,1024, msg, argp);
@@ -28,7 +31,7 @@ void assertFunction(int line, const char* file, const char* msg,...) {
 
 	sprintf_s( log,1024, "Assert l.%i in %s : \n%s\n",line, file, pszBuf); 
 
-	MessageBox( NULL, log, "Assert", MB_OK);
+	MessageBox(hWnd , log, "Assert", MB_OK);
 #ifndef DEBUG_TOOL_EXTERNAL
 	DebugBreak();
 #else

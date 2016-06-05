@@ -29,6 +29,8 @@ CKLBNetAPIKeyChain::CKLBNetAPIKeyChain()
 , m_appID   (NULL)
 , m_userID  (NULL) 
 , m_URL		(NULL)
+, m_loginKey(NULL)
+, m_loginPwd(NULL)
 {
 }
 
@@ -60,4 +62,8 @@ CKLBNetAPIKeyChain::release() {
 	m_userID	= NULL; // 2012.11.27  解放漏れがあったので修正
 	KLBDELETEA(m_URL);
 	m_URL		= NULL;
+	KLBDELETEA(m_loginKey);
+	m_loginKey	= NULL;
+	KLBDELETEA(m_loginPwd);
+	m_loginPwd	= NULL;
 }

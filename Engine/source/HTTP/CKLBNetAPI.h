@@ -90,6 +90,7 @@ public:
 	u32						m_http_header_length;
 	bool					m_canceled;	// セッションがキャンセルされると true になる
 	CKLBJsonItem*			m_pRoot;
+	int						m_request_type;	// For request type
 
 	// スクリプトコールバック用
 	const char			*	m_callback;	// Lua callback function

@@ -174,8 +174,10 @@ int CKLBLuaLibENG::luaForbidSleep(lua_State * L)
 
 bool CKLBLuaLibENG::isRelease()
 {
+#ifndef IS_RELEASE
+#define IS_RELEASE true
+#endif
 	#if defined(DEBUG_MEMORY) || defined(DEBUG_PERFORMANCE) || defined(DEBUG_LUAEDIT) || defined(DEBUG_RT_CHECK) || defined(DEBUG_MENU)
-		/*
 		IPlatformRequest& pfif = CPFInterface::getInstance().platform();
 		pfif.logging("===== Engine Compile Flags =====");
 		#if defined(DEBUG_MEMORY) 
@@ -194,11 +196,11 @@ bool CKLBLuaLibENG::isRelease()
 		pfif.logging("DEBUG_MENU");
 		#endif
 		pfif.logging("================================");
-		*/
-		return false;
+		// return false;
 	#else
 		return true;
 	#endif
+		return IS_RELEASE;
 }
 
 const char* CKLBLuaLibENG::getPlatform()

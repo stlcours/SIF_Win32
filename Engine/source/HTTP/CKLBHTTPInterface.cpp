@@ -98,16 +98,20 @@ void CKLBHTTPInterface::download() {
 					{
 						// Create X-Message-Code header
 						u8* hash;
-						char temp[64];
+						char temp[41];
+						char xmc[64];
 
 						hash = HMAC(EVP_sha1(), XMESSAGECODE_KEY, XMESSAGECODE_LEN, reinterpret_cast<const u8*>(ptr + 1), content_len, NULL, NULL);
 
 						for(int i = 0; i < 20; i++)
-							sprintf(temp, "%s%02x", temp, hash[i]);
+						{
+							temp[i * 2 + 1] = 32;
+							sprintf(temp + i * 2, "%02x", hash[i]);
+						}
 
-						sprintf(temp, "X-Message-Code: %s", temp);
+						sprintf(xmc, "X-Message-Code: %s", temp);
 
-						curl_slist_append(headerlist, temp);
+						curl_slist_append(headerlist, xmc);
 					}
 					// Restore array in case of reuse...
 					*ptr = '=';
@@ -520,7 +524,7 @@ void CKLBHTTPInterface::clear() {
 }
 
 // GET発衁
-bool CKLBHTTPInterface::httpGET(const char * url, bool isProxy)
+bool CKLBHTTPInterface::httpGET(const char * url, bool isProxy = false)
 {
 	klb_assert(isProxy==false,"Proxy Not supported");
 
@@ -535,7 +539,7 @@ bool CKLBHTTPInterface::httpGET(const char * url, bool isProxy)
 }
 
 // POST発衁
-bool CKLBHTTPInterface::httpPOST(const char * url, bool isProxy)
+bool CKLBHTTPInterface::httpPOST(const char * url, bool isProxy = false)
 {
 	klb_assert(isProxy==false,"Proxy Not supported");
 
