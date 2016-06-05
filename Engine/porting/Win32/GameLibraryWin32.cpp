@@ -371,7 +371,7 @@ int GameEngineMain(int argc, _TCHAR* argv[])
 
 	g_fileName[0] = 0;
 
-	bool hasDefaultFont = false;
+	bool hasDefaultFont = true;
 	bool hasDefaultDB   = false;
 
 	if (argc > 1) {

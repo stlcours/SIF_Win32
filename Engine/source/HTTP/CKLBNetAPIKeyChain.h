@@ -101,11 +101,22 @@ public:
 	inline const char* setURL(const char* a)
 	{
 		KLBDELETEA(m_URL);
-		if(a)
-			m_URL=CKLBUtility::copyString(a);
-		else
-			m_URL=NULL;
+		m_URL = a ? CKLBUtility::copyString(a) : NULL;
 		return m_URL;
+	}
+
+	inline const char* setLoginKey(const char* login_key)
+	{
+		KLBDELETEA(m_loginKey);
+		m_loginKey = login_key ? CKLBUtility::copyString(login_key) : NULL;
+		return m_loginKey;
+	}
+
+	inline const char* setLoginPwd(const char* passwd)
+	{
+		KLBDELETEA(m_loginPwd);
+		m_loginPwd = passwd ? CKLBUtility::copyString(passwd) : NULL;
+		return m_loginPwd;
 	}
     
     inline const char * getToken		() const { return m_token;	}
@@ -115,6 +126,8 @@ public:
     inline const char * getAppID		() const { return m_appID;	}
 	inline const char * getUserID		() const { return m_userID; }
 	inline const char * getURL			() const { return m_URL; }
+	inline const char * getLoginKey		() const { return m_loginKey; }
+	inline const char * getLoginPw		() const { return m_loginPwd; }
 
 	inline int genCmdNumID(char * retBuf, const char * body, time_t timeStamp, int serial) {
 		sprintf(retBuf, "%s.%d.%d",
@@ -129,8 +142,10 @@ private:
     const char      *   m_client;   // client version
     const char      *   m_cKey;     // consumerKey
     const char      *   m_appID;    // Application ID
-	const char		*	m_userID;	// User-ID
+	const char		*	m_userID;	// User-ID (actually number)
 	const char		*	m_URL;		// URL point
+	const char		*	m_loginKey;	// Login key. LOVELIVE_ID::user_id
+	const char		*	m_loginPwd;	// Login password. LOVELIVE_PW::passwd
 };
 
 #endif
