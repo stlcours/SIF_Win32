@@ -36,10 +36,11 @@ public:
     }
     
     // 引数取得メソッド
-	inline bool isNil	(int pos) { return lua_isnil(m_L, pos)		? true : false; }
+	inline bool isNil	(int pos) { return lua_isnil(m_L, pos); }
 	inline bool isNum	(int pos) { return lua_isnumber(m_L, pos)	? true : false; }
 	inline bool isString(int pos) { return lua_isstring(m_L, pos)	? true : false; }
-	inline bool isTable	(int pos) { return lua_istable(m_L, pos)	? true : false; }
+	inline bool isTable	(int pos) { return lua_istable(m_L, pos); }
+	inline bool isBool	(int pos) { return lua_isboolean(m_L, pos); }
 	void print_stack();
 
     inline bool getBool(int pos) {

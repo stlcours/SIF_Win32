@@ -239,7 +239,7 @@ void CLuaState::print_stack() {
 			{
 				// Only one level currently
 				printf("\nLUA TABLE DUMP START STACK %d\n", i);
-				klb_assert(luaL_loadstring(m_L, "for a,b in pairs({...}[1])do print(n,v)end") == 0, "Syntax error");
+				klb_assert(luaL_loadstring(m_L, "for a,b in pairs(({...})[1])do print(a,b)end") == 0, "Syntax error");
 				retValue(i);
 				klb_assert(lua_pcall(m_L, 1, 0, 0) == 0, "Syntax error");
 				printf("LUA TABLE DUMP END STACK %d\n", i);

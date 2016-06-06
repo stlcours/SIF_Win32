@@ -175,7 +175,7 @@ int CKLBLuaLibENG::luaForbidSleep(lua_State * L)
 bool CKLBLuaLibENG::isRelease()
 {
 #ifndef IS_RELEASE
-#define IS_RELEASE true
+#define IS_RELEASE false
 #endif
 	#if defined(DEBUG_MEMORY) || defined(DEBUG_PERFORMANCE) || defined(DEBUG_LUAEDIT) || defined(DEBUG_RT_CHECK) || defined(DEBUG_MENU)
 		IPlatformRequest& pfif = CPFInterface::getInstance().platform();

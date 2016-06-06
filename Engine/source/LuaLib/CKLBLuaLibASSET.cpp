@@ -15,6 +15,8 @@
 */
 #include "CKLBLuaLibASSET.h"
 #include "CKLBUtility.h"
+#include "CWin32PathConv.h"
+#include "dirent.h"
 
 static ILuaFuncLib::DEFCONST luaConst[] = {
 //	{ "DBG_M_SWITCH",	DBG_MENU::M_SWITCH },
@@ -35,6 +37,7 @@ CKLBLuaLibASSET::addLibrary()
 	addFunction("ASSET_getAssetInfo",		CKLBLuaLibASSET::luaGetAssetInfo);
 	addFunction("ASSET_delExternal",		CKLBLuaLibASSET::luaDelExternal);
 	addFunction("ASSET_getExternalFree",	CKLBLuaLibASSET::luaGetExternalFree);
+	addFunction("ASSET_getFileList",		CKLBLuaLibASSET::luaGetFileList);
 }
 
 s32
@@ -162,6 +165,39 @@ CKLBLuaLibASSET::luaGetExternalFree(lua_State * L)
 	}
 	s32 res = (s32)CPFInterface::getInstance().platform().getFreeSpaceExternalKB(); // Never return more than 0xFFFFFF
 	lua.retInt(res);
+	return 1;
+}
+
+s32 CKLBLuaLibASSET::luaGetFileList(lua_State* L)
+{
+	CWin32PathConv& pc = CWin32PathConv::getInstance();
+	const char* path = pc.fullpath(lua_tolstring(L, 1, NULL) + 7);
+
+	DIR* dir;
+	dirent* ent;
+	int i = 0;
+
+	lua_newtable(L);
+
+	if(path)
+	{
+		if(dir = opendir(path))
+		{
+			while(ent = readdir(dir))
+			{
+				lua_pushinteger(L, ++i);
+				lua_newtable(L);
+				lua_pushstring(L, "name");
+				lua_pushstring(L, ent->d_name);
+				lua_rawset(L, -3);
+				lua_rawset(L, -3);
+			}
+
+			closedir(dir);
+		}
+	}
+
+	delete[] path;
 	return 1;
 }
 
