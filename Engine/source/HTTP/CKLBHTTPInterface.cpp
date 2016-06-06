@@ -134,9 +134,7 @@ void CKLBHTTPInterface::download() {
 		curl_easy_setopt(m_pCurl, CURLOPT_PROGRESSDATA,		(void*)this		);
 		curl_easy_setopt(m_pCurl, CURLOPT_WRITEHEADER,		(void*)this		);
  		curl_easy_setopt(m_pCurl, CURLOPT_HEADERFUNCTION,	headerReceive_func);
-#ifndef _WIN32
-		curl_easy_setopt(m_pCurl, CURLOPT_ACCEPT_ENCODING,	"gzip,deflate");
-#endif
+		// curl_easy_setopt(m_pCurl, CURLOPT_ACCEPT_ENCODING,	"gzip,deflate"); // I'm too lazy to decompress it later
 		CURLcode res = curl_easy_perform(m_pCurl);
 		if (res == CURLE_OK) {
 			curl_easy_getinfo (m_pCurl, CURLINFO_RESPONSE_CODE, &m_errorCode);
@@ -208,13 +206,18 @@ size_t CKLBHTTPInterface::headerReceive_func( void *ptr, size_t size, size_t nme
 		}
 	}
 
-	if (strncmpi("Status: ",data, 8/*Status: */)==0) {
+	if (strncmpi("status_code: ",data, 13) == 0) {
 		int code = 0;
 		while ((*data >= '0') && (*data <= '9')) {
 			code = (code * 10) + (*data);
 			data++;
 		}
 		((CKLBHTTPInterface*)userdata)->m_tmpErrorCode = code;
+	}
+
+	if (strncmpi("version_up: ", data, 12) == 0)
+	{
+		((CKLBHTTPInterface*)userdata)->m_versionup = data[12] == '1';
 	}
 
 	if (strncmpi("Server-Version:", data, 15/*Server-Version*/) == 0) {
@@ -232,8 +235,8 @@ size_t CKLBHTTPInterface::headerReceive_func( void *ptr, size_t size, size_t nme
 		if (mem) {
 			mem[lineSize] = 0;
 			((CKLBHTTPInterface*)userdata)->m_pServerVersion = mem;
-			// IPlatformRequest& pForm = CPFInterface::getInstance().platform();
-			// pForm.logging("HTTPInterface::get Server-Version %s %8X",mem);
+			IPlatformRequest& pForm = CPFInterface::getInstance().platform();
+			pForm.logging("HTTPInterface::get Server-Version %s %8X",mem);
 
 		}
 	}

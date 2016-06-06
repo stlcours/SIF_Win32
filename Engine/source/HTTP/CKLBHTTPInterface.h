@@ -73,7 +73,8 @@ public:
     // httpのstate取得 2013.2.13  追加
 	int getHttpState();
 
-	bool isMaintenance()										{ return this->m_maintenance; }
+	inline bool isMaintenance() { return this->m_maintenance; }
+	inline bool isOutdated() { return this->m_versionup; }
 	bool hasHeader(const char* header, const char** value);
 private:
 	void clear();
@@ -96,6 +97,7 @@ private:
 	bool		m_bothFileAndMem;
 	bool		m_post;
 	bool		m_maintenance;
+	bool		m_versionup;
 	const char*	m_url;
 	void*		m_pCurl;
 	const char*	m_pServerVersion;

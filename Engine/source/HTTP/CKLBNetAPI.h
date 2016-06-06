@@ -16,6 +16,8 @@
 #ifndef CKLBNetAPI_h
 #define CKLBNetAPI_h
 
+//#include <vector>
+
 #include "CKLBLuaTask.h"
 #include "CKLBHTTPInterface.h"
 #include "CKLBJsonItem.h"
@@ -71,19 +73,18 @@ public:
 	static CKLBNetAPI* create(	CKLBTask* pParentTask, 
 								const char * callback);
 	void set_header(CKLBHTTPInterface* http, const char* authorize_string);
-	bool login(const char* loginID,const char* password,const char* invite,unsigned int timeout,unsigned int* session);
+	void request_authkey(int timeout);
+	void startUp(int phase, int status_code);
+	void login(int phase, int status_code);
 	bool cancel(unsigned int uniq);
 	void cancelAll();
-	void debugHdr(bool debugflag);
-	bool sendHTTP(const char* apiURL, const char* json, unsigned int timeout, bool passVersionCheck, u32* session);
-	bool watchMaintenance(unsigned int timeout, u32* session);
-	void genCmdNumID(const char* body, int serial, char* buf);
 	void execute(u32 deltaT);
 	void die();
 
 	bool initScript(CLuaState& lua);
 	int commandScript(CLuaState& lua);
 //private:
+	//std::vector<CKLBHTTPInterface*> m_http_list;	// Multithreaded network.
 	CKLBHTTPInterface*		m_http;		// そのセッションで使用されている接続
 	u32						m_timeout;	// タイムアウト時間
 	u32						m_timestart;
@@ -91,9 +92,13 @@ public:
 	bool					m_canceled;	// セッションがキャンセルされると true になる
 	CKLBJsonItem*			m_pRoot;
 	int						m_request_type;	// For request type
+	int						m_nonce;		// Request counter
+	int						m_netapi_phase;
+	bool					m_downloading;
 
 	// スクリプトコールバック用
 	const char			*	m_callback;	// Lua callback function
+	const char			*	m_verup_callback;	// Lua callback function for update
 
 	// HTTP通信で追加するヘッダの配列
 	const char			**	m_http_header_array;
@@ -102,10 +107,9 @@ public:
 	void freeHeader();
 	void freeJSonResult();
 
-	bool lua_callback(int msg, int status, CKLBJsonItem * pRoot);
+	bool lua_callback(int msg, int status, CKLBJsonItem * pRoot, int uniq = 0);
 
 	CKLBJsonItem * getJsonTree(const char * json_string, u32 dataLen);
-	bool get_token(CKLBJsonItem * pRoot);
 
 //public:
 	bool cancel		();
