@@ -22,6 +22,10 @@
 
 #include "lua.hpp"
 #include "CPFInterface.h"
+
+extern "C" void LockLuaState(lua_State* L);
+extern "C" void UnlockLuaState(lua_State* L);
+
 class CLuaState
 {
 	friend class CKLBScriptEnv;
@@ -41,6 +45,8 @@ public:
 	inline bool isString(int pos) { return lua_isstring(m_L, pos)	? true : false; }
 	inline bool isTable	(int pos) { return lua_istable(m_L, pos); }
 	inline bool isBool	(int pos) { return lua_isboolean(m_L, pos); }
+	inline void lock	() { LockLuaState(m_L); }
+	inline void unlock	() { UnlockLuaState(m_L); }
 	void print_stack();
 
     inline bool getBool(int pos) {

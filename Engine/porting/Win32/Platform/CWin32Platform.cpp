@@ -294,8 +294,6 @@ void removeTmpFileNative(const char* filePath) {
 
 u32 CWin32Platform::getFreeSpaceExternalKB() {
 	const char * fullpath = CWin32PathConv::getInstance().fullpath("external/");
-	char* patch = (char*)&fullpath[3]; // e:/
-	*patch = 0;
 	ULARGE_INTEGER FreeByteCaller;
 	ULARGE_INTEGER TotalByte;
 	ULARGE_INTEGER FreeByteTotal;
@@ -305,10 +303,11 @@ u32 CWin32Platform::getFreeSpaceExternalKB() {
 	if (success) {
 		s64 r = FreeByteCaller.QuadPart;
 		r >>= 10; // Into KB, round down !
-		if (r > 0x00FFFFFFLL) {
-			r = 0x00FFFFFF;
-		}
-		result = (u32)r;
+
+		if (r > 0x7FFFFFFFLL)
+			result = 0x7FFFFFFF;
+		else
+			result = (u32)r;
 	}
 	delete [] fullpath;
 	return result;

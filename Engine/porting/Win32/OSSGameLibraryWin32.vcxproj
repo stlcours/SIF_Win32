@@ -145,7 +145,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <None Include="..\..\source\Rendering\shaderSource.inl" />
-    <None Include="Playground.ico" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Projects\WorldTest\CWorldTask.h" />
@@ -1434,6 +1433,7 @@
     <ClCompile Include="assert.c">
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsCpp</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug_CSharp|Win32'">CompileAsC</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsCpp</CompileAs>
     </ClCompile>
     <ClCompile Include="EngineStdReferenceOSS.cpp" />
     <ClCompile Include="GameLibraryWin32.cpp" />
@@ -1449,6 +1449,7 @@
     <ClCompile Include="Platform\CWin32TmpFile.cpp" />
     <ClCompile Include="Platform\CWin32Widget.cpp" />
     <ClCompile Include="Platform\CWin32WriteFileStream.cpp" />
+    <ClCompile Include="Platform\Win32LuaLock.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug_CSharp|Win32'">Create</PrecompiledHeader>
@@ -1469,9 +1470,6 @@
     <ClCompile Include="zlib\trees.c" />
     <ClCompile Include="zlib\uncompr.c" />
     <ClCompile Include="zlib\zutil.c" />
-  </ItemGroup>
-  <ItemGroup>
-    <ResourceCompile Include="res.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

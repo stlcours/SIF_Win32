@@ -96,6 +96,8 @@
       <AdditionalDependencies>$(SolutionDir)/Output/$(Configuration)\OSSGameLibraryWin32.lib;wsock32.lib;Ws2_32.lib;Wldap32.lib;opengl32.lib;glu32.lib;$(SolutionDir)/Platform/libs/glut32.lib;$(SolutionDir)/Platform/libs/glew32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <IgnoreSpecificDefaultLibraries>MSVCRT</IgnoreSpecificDefaultLibraries>
       <AdditionalLibraryDirectories>$(ProjectDir)directx</AdditionalLibraryDirectories>
+      <SubSystem>Console</SubSystem>
+      <EntryPointSymbol>mainCRTStartup</EntryPointSymbol>
     </Link>
     <PostBuildEvent>
       <Command>copy $(OutDir)..\..\gl*.dll $(OutDir)</Command>
@@ -141,6 +143,8 @@
       <IgnoreSpecificDefaultLibraries>MSVCRT</IgnoreSpecificDefaultLibraries>
       <AdditionalLibraryDirectories>$(ProjectDir)directx</AdditionalLibraryDirectories>
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
+      <SubSystem>Windows</SubSystem>
+      <EntryPointSymbol>mainCRTStartup</EntryPointSymbol>
     </Link>
     <PostBuildEvent>
       <Command>copy $(OutDir)..\..\*.dll $(OutDir)</Command>

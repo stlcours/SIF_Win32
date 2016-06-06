@@ -148,10 +148,12 @@ typedef lu_int32 Instruction;
 #define LUA_MINBUFFER	32
 #endif
 
+void LockLuaState(lua_State *L);
+void UnlockLuaState(lua_State* L);
 
 #if !defined(lua_lock)
-#define lua_lock(L)     ((void) 0)
-#define lua_unlock(L)   ((void) 0)
+#define lua_lock(L)     LockLuaState(L);
+#define lua_unlock(L)   UnlockLuaState(L);
 #endif
 
 #if !defined(luai_threadyield)
