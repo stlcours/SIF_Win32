@@ -73,9 +73,11 @@ bool
 CLuaState::callback(const char * func, const char * argform, ...)
 {
 	va_list ap;
+	lock();
 	va_start(ap, argform);
 	bool result = call_luafunction(0, func, argform, ap);
 	va_end(ap);
+	unlock();
 	return result;
 }
 
@@ -148,6 +150,7 @@ bool
 CLuaState::call(int args, const char * func, int nresults)
 {
     // call stackを取れるようにtraceback函数をpushしpcallの第四引数を修正.
+
     int base = lua_gettop(m_L) - args;
     lua_pushcfunction(m_L, traceback);
     lua_insert(m_L, base);
@@ -178,6 +181,7 @@ CLuaState::call(int args, const char * func, int nresults)
         KLBDELETEA(buffer); // assert発生するとここまで来ない予感はする.
         return false;
     }
+	unlock();
     return true;
 }
 

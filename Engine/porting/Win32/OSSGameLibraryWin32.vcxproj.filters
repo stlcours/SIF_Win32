@@ -120,9 +120,6 @@
     <None Include="..\..\source\Rendering\shaderSource.inl">
       <Filter>Source Files\Rendering\OpenGLWrapper</Filter>
     </None>
-    <None Include="Playground.ico">
-      <Filter>Resource Files</Filter>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -1852,10 +1849,8 @@
     <ClCompile Include="zlib\zutil.c">
       <Filter>libs\zlib</Filter>
     </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <ResourceCompile Include="res.rc">
-      <Filter>Resource Files</Filter>
-    </ResourceCompile>
+    <ClCompile Include="Platform\Win32LuaLock.cpp">
+      <Filter>Platform</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
