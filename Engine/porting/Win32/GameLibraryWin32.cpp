@@ -43,6 +43,7 @@
 //-----------------------------------------
 //  Global Execution Context
 //
+#include "CKLBDrawTask.h"
 #include "CKLBDebugger.h"
 #include "CKLBRendering.h"
 #include "CKLBAsset.h"
@@ -235,10 +236,25 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			}
 
 			break;
+		case WM_SIZING:
+			{
+				RECT* data = (RECT*)lParam;
+				RECT client_size;
+
+				printf("left = %d; top = %d; right = %d; bottom = %d\n", data->left, data->top, data->right, data->bottom);
+				GetClientRect(hWnd, &client_size);
+				
+				CKLBDrawResource::getInstance().setLogicalResolution(client_size.right, client_size.bottom);
+				CPFInterface::getInstance().client().setScreenInfo(false, client_size.right, client_size.bottom);
+
+				return 1;
+			}
         case WM_DESTROY:
             PostQuitMessage(0);                                             
             break;
 
+		case WM_SIZE:
+//			_CrtDbgBreak();
         default:                                                            
             return DefWindowProc(hWnd, message, wParam, lParam);            
     }                                                                   
@@ -345,6 +361,7 @@ int GameEngineMain(int argc, _TCHAR* argv[])
 #endif
 {
 	bool bStdModuleExist = EngineStdReference();
+	bool is_maximized = false;
 	klb_assert(bStdModuleExist, "The links of a system are insufficient.");
 
 	glutInit(&argc, argv);
@@ -412,6 +429,9 @@ int GameEngineMain(int argc, _TCHAR* argv[])
 					CWin32Platform::setEncrypt(encrypt);
 				}
 
+				if (strcmp("-maximize", argv[parse]) == 0)
+					is_maximized = argv[parse+1][0] == '1';
+
 				if (strcmp("-no", argv[parse]) == 0) {
 					if (strcmp("defaultfont", argv[parse+1]) == 0) {
 						hasDefaultFont = false;
@@ -433,12 +453,16 @@ int GameEngineMain(int argc, _TCHAR* argv[])
 			}
 		}
 	}
+
+	DWORD Window_Flags = is_maximized ? (WS_POPUP | WS_VISIBLE) : (WS_CAPTION | WS_VISIBLE | WS_MINIMIZEBOX | WS_SYSMENU);
 	RECT temp = {0, 0, WIDTH, HEIGHT};
 
-	AdjustWindowRect(&temp, WS_CAPTION | WS_VISIBLE | WS_MINIMIZEBOX | WS_SYSMENU, 0);
+	AdjustWindowRect(&temp, Window_Flags, 0);
 
-	int scrW	= abs(temp.left) + temp.right;
-	int scrH	= abs(temp.top) + temp.bottom;
+	int scrW	= temp.right - temp.left;
+	int scrH	= temp.bottom - temp.top;
+
+	CreateDirectoryA(g_pathExtern, NULL);
 
 	CWin32PathConv& pathconv = CWin32PathConv::getInstance();
 	pathconv.setPath(g_pathInstall, g_pathExtern);
@@ -465,7 +489,7 @@ int GameEngineMain(int argc, _TCHAR* argv[])
 	// create main window
 	hwnd = CreateWindowExA(0,
 		"GameEngineGL", "Playground", 
-		WS_CAPTION | WS_VISIBLE | WS_MINIMIZEBOX | WS_SYSMENU,
+		Window_Flags,
 		CW_USEDEFAULT, CW_USEDEFAULT, scrW, scrH,
 		NULL, NULL, hInstance, NULL );
 	
@@ -481,53 +505,6 @@ int GameEngineMain(int argc, _TCHAR* argv[])
 	EnableWindow(hwnd, TRUE);
 
 	DragAcceptFiles(hwnd, true);
-
-	RECT area;
-	area.left = 0;
-	area.top = 0;
-#ifdef _WIN32_WCE
-	area.right = GetSystemMetrics(SM_CXSCREEN);
-	area.bottom = GetSystemMetrics(SM_CYSCREEN);
-
-	SetWindowLong(hwnd, GWL_STYLE, WS_POPUP);
-
-	SetWindowPos(hwnd, HWND_TOPMOST,
-					area.left, area.top,
-					area.right, area.bottom,
-					SWP_FRAMECHANGED);
-#else
-	// Window border hard coded
-	//area.right = scrW + 8;
-	//area.bottom = scrH + 27;
-	//area.right = GetSystemMetrics(SM_CXSCREEN);
-	//area.bottom = GetSystemMetrics(SM_CYSCREEN);
-	//SetWindowPos(hwnd, HWND_TOP,
-	//				area.left, area.top,
-	//				area.right, area.bottom,
-	//				SWP_NOMOVE);
-	/*
-	int addW = GetSystemMetrics(SM_CXSIZEFRAME) * 2;
-	int addH = GetSystemMetrics(SM_CYSIZEFRAME) * 2 + GetSystemMetrics(SM_CYCAPTION);
-	area.right = scrW + addW;
-	area.bottom = scrH + addH;
-	
-	SetWindowPos(hwnd, HWND_TOP,
-					area.left, area.top,
-					area.right, area.bottom,
-					SWP_NOMOVE);
-	*/
-#endif
-
-	/* set as foreground window to give this app focus in case it doesn't have it */
-	SetForegroundWindow(hwnd);
-	ShowWindow(hwnd, SW_SHOWNORMAL);
-
-	glClearColor(1.0f, 0.7f, 0.2039f, 0.0f);
-	glDisable( GL_CULL_FACE );
-
-	//
-
-	// testCodeInit();
 
 	CPFInterface& pfif = CPFInterface::getInstance();
 	CWin32Platform * pPlatform = new CWin32Platform(hwnd);
@@ -547,7 +524,26 @@ int GameEngineMain(int argc, _TCHAR* argv[])
 	SoundSystemInitFor_Win32();
 	CWin32AudioMgr::getInstance().init(hwnd);
 
+	/* set as foreground window to give this app focus in case it doesn't have it */
+	SetForegroundWindow(hwnd);
+	ShowWindow(hwnd, is_maximized ? SW_SHOWMAXIMIZED : SW_SHOWNORMAL);
+
+	glClearColor(1.0f, 0.7f, 0.2039f, 0.0f);
+	glDisable( GL_CULL_FACE );
+
+	//
+
+	// testCodeInit();
+
 	// set screen size
+	if(is_maximized)
+	{
+		RECT client_area;
+		GetClientRect(hwnd, &client_area);
+
+		WIDTH = client_area.right;
+		HEIGHT = client_area.bottom;
+	}
 	pfif.client().setScreenInfo(false, WIDTH, HEIGHT);
 	// boot path
 	if (strlen(g_fileName)) {

@@ -142,10 +142,10 @@ void
 CWin32Platform::detailedLogging(const char * /*basefile*/, const char * /*functionName*/, int /*lineNo*/, const char * format, ...)
 {
 	va_list	ap;
-	char log	[1024];
+	char log	[4096];
 
 	va_start(ap, format);
-	vsprintf_s( log,1024, format, ap);
+	vsprintf_s( log,4096, format, ap);
 	va_end(ap);
 	strcat(log, "\n");
 
@@ -240,6 +240,9 @@ CWin32Platform::openTmpFile(const char * filePath)
 	// file://external/ 以外が指定された場合は処理を行わない。
 	const char * target = "file://external/";
 	int len = strlen(target);
+
+	if(strstr(filePath, "pkg_")) _CrtDbgBreak();
+
 	if(!strncmp(filePath, target, len)) {
 		CWin32TmpFile * pTmpFile = new CWin32TmpFile(filePath);
 		if(!pTmpFile->isReady()) {

@@ -367,7 +367,7 @@ CKLBNetAPI::execute(u32 deltaT)
 				const char* server_ver[1];
 				if(m_http->hasHeader("Server-Version", server_ver))
 				{
-					if(strcmp(*server_ver, kc.getClient()))
+					if(strncmp(*server_ver, kc.getClient(), strlen(kc.getClient())))
 					{
 						// We need to download some data.
 						NetworkManager::releaseConnection(m_http);
@@ -385,7 +385,7 @@ CKLBNetAPI::execute(u32 deltaT)
 		m_http = NULL;
 		m_request_type = (-1);
 
-		lua_callback(msg, state, m_pRoot);
+		lua_callback(msg, state, m_pRoot, m_nonce - 1);
 
 		return;
 	}
@@ -648,14 +648,14 @@ CKLBNetAPI::commandScript(CLuaState& lua)
 			kc.setLoginKey(lua.getString(3));
 			kc.setLoginPwd(lua.getString(4));
 
-			auth = create_authorize_string(kc.getConsumerKey(), m_nonce++);
+			auth = create_authorize_string(kc.getConsumerKey(), m_nonce);
 
 			m_timeout = lua.getInt(5);
 			m_timestart = 0;
 			
 			request_authkey(m_timeout);
 
-			lua.retInt(1);
+			lua.retInt(m_nonce);
 		}
 		break;
 		case NETAPI_CANCEL:
@@ -671,7 +671,7 @@ CKLBNetAPI::commandScript(CLuaState& lua)
 		{
 			//
 			// 3. Request data table
-			// 4. End point URL
+			// 4. End point URL. Defaults to "/api" if is nil
 			// 5. Timeout
 			// 6. Skip version check?
 			//
@@ -681,7 +681,11 @@ CKLBNetAPI::commandScript(CLuaState& lua)
 			}
 			else {
 				char api[MAX_PATH];
-				sprintf(api, "%s%s", kc.getURL(), lua.getString(4));
+				const char* end_point = "/api";
+
+				if(lua.isString(4))
+					end_point = lua.getString(4);
+				sprintf(api, "%s%s", kc.getURL(), end_point);
 
 				// Header list
 				const char** headers = NULL;
@@ -704,7 +708,7 @@ CKLBNetAPI::commandScript(CLuaState& lua)
 						char* json;
 						const char * items[2];
 						const char* req = "request_data=";
-						const char* authorize = create_authorize_string(kc.getConsumerKey(), m_nonce++, kc.getToken());
+						const char* authorize = create_authorize_string(kc.getConsumerKey(), m_nonce, kc.getToken());
 						int send_json_length = strlen( send_json );
 						int req_length = strlen( req );
 
@@ -730,7 +734,7 @@ CKLBNetAPI::commandScript(CLuaState& lua)
 					m_timeout	= lua.getInt(5);
 					m_timestart = 0;
 
-					lua.retInt(0);
+					lua.retInt(m_nonce);
 				} else {
 					// Connection creation failed.
 					lua.retBoolean(false);
