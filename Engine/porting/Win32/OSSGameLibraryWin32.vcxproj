@@ -1474,6 +1474,7 @@
     <ClCompile Include="Platform\CWin32Widget.cpp" />
     <ClCompile Include="Platform\CWin32WriteFileStream.cpp" />
     <ClCompile Include="Platform\Win32LuaLock.cpp" />
+    <ClCompile Include="Platform\Win32TouchLib.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug_CSharp|Win32'">Create</PrecompiledHeader>

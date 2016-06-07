@@ -21,6 +21,7 @@
 
 #include "GameEngine.h"
 #include "EngineStdReference.h"
+#include "Win32TouchLib.h"
 
 #include <assert.h>
 #include <float.h>
@@ -125,31 +126,40 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			// DragQueryFile((HDROP)wParam, 0, &fileNameBuff[0], 512);			
 			break;
         case WM_LBUTTONDOWN:
-			if(mouse_stat) {	// ボタンを押したまま画面外に出た
-				// 最後の座標を使って、無理やり RELEASEを送る
-                // If going out of the screen with a pushed button
-                // Force sending a RELEASE signal.
-				CPFInterface::getInstance().client().inputPoint(0, IClientRequest::I_RELEASE,
-						lastX, lastY);
-				mouse_stat = 0;
+			if(GetMessageExtraInfo() == 0)
+			{
+				if(mouse_stat) {	// ボタンを押したまま画面外に出た
+					// 最後の座標を使って、無理やり RELEASEを送る
+					// If going out of the screen with a pushed button
+					// Force sending a RELEASE signal.
+					CPFInterface::getInstance().client().inputPoint(0, IClientRequest::I_RELEASE,
+							lastX, lastY);
+					mouse_stat = 0;
+				}
+				CPFInterface::getInstance().client().inputPoint(0, IClientRequest::I_CLICK,
+						GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+				mouse_stat = 1;
+				break;
 			}
-			CPFInterface::getInstance().client().inputPoint(0, IClientRequest::I_CLICK,
-					GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
-			mouse_stat = 1;
-			break;
 		case WM_MOUSEMOVE:
-			if (wParam & MK_LBUTTON) {
-				lastX = GET_X_LPARAM(lParam);
-				lastY = GET_Y_LPARAM(lParam);
-				CPFInterface::getInstance().client().inputPoint(0, IClientRequest::I_DRAG,
-						lastX, lastY);
+			if(GetMessageExtraInfo() == 0)
+			{
+				if (wParam & MK_LBUTTON) {
+					lastX = GET_X_LPARAM(lParam);
+					lastY = GET_Y_LPARAM(lParam);
+					CPFInterface::getInstance().client().inputPoint(0, IClientRequest::I_DRAG,
+							lastX, lastY);
+				}
+				break;
 			}
-			break;
 		case WM_LBUTTONUP:
-			CPFInterface::getInstance().client().inputPoint(0, IClientRequest::I_RELEASE,
-					GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
-			mouse_stat = 0;
-			break;
+			if(GetMessageExtraInfo() == 0)
+			{
+				CPFInterface::getInstance().client().inputPoint(0, IClientRequest::I_RELEASE,
+						GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+				mouse_stat = 0;
+				break;
+			}
 		case WM_KEYDOWN:
 			switch (wParam) {
 			case VK_ESCAPE:
@@ -238,22 +248,41 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			}
 
 			break;
-		case WM_SIZING:
-			{
-				RECT* data = (RECT*)lParam;
-				RECT client_size;
-
-				printf("left = %d; top = %d; right = %d; bottom = %d\n", data->left, data->top, data->right, data->bottom);
-				GetClientRect(hWnd, &client_size);
-				
-				CKLBDrawResource::getInstance().setLogicalResolution(client_size.right, client_size.bottom);
-				CPFInterface::getInstance().client().setScreenInfo(false, client_size.right, client_size.bottom);
-
-				return 1;
-			}
         case WM_DESTROY:
             PostQuitMessage(0);                                             
             break;
+		case WM_TOUCH:
+			{
+				using namespace Win32Touch;
+
+				TouchInputList touchlist = GetTouchList((void*)lParam, LOWORD(wParam));
+				IClientRequest& cr = CPFInterface::getInstance().client();
+
+				for(TouchInputList::iterator i = touchlist.begin(); i != touchlist.end(); i++)
+				{
+					TouchPoint& cur = *i;
+					IClientRequest::INPUT_TYPE type;
+
+					switch(cur.Type)
+					{
+						case TouchDown:
+							type = IClientRequest::I_CLICK;
+							break;
+						case TouchUp:
+							type = IClientRequest::I_RELEASE;
+							break;
+						case TouchMove:
+							type = IClientRequest::I_DRAG;
+							break;
+						default:
+							klb_assertAlways("Unknown touch type. TouchID = %d", cur.TouchID);
+							break;
+					}
+					DEBUG_PRINT("TouchID = %d; X = %d; Y = %d; Type = %d", cur.TouchID, cur.X, cur.Y, int(cur.Type));
+					cr.inputPoint(cur.TouchID, type, cur.X, cur.Y);
+				}
+			}
+			// Does not break;
         default:                                                            
             return DefWindowProc(hWnd, message, wParam, lParam);            
     }                                                                   
@@ -459,7 +488,7 @@ int GameEngineMain(int argc, _TCHAR* argv[])
 		}
 	}
 
-	DWORD Window_Flags = is_maximized ? (WS_POPUP | WS_VISIBLE) : (WS_CAPTION | WS_VISIBLE | WS_MINIMIZEBOX | WS_SYSMENU);
+	DWORD Window_Flags = WS_CAPTION | WS_VISIBLE | WS_MINIMIZEBOX | WS_SYSMENU;
 	RECT temp = {0, 0, WIDTH, HEIGHT};
 
 	AdjustWindowRect(&temp, Window_Flags, 0);
@@ -506,10 +535,11 @@ int GameEngineMain(int argc, _TCHAR* argv[])
 
 	// COM Initialization
 	CoInitialize(NULL);
-
 	EnableWindow(hwnd, TRUE);
-
 	DragAcceptFiles(hwnd, true);
+
+	// Register touch window
+	Win32Touch::RegisterWindowForTouch(hwnd);
 
 	CPFInterface& pfif = CPFInterface::getInstance();
 	CWin32Platform * pPlatform = new CWin32Platform(hwnd);
