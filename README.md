@@ -16,6 +16,28 @@ No. It's a native windows application with size around 5MB and no emulation is u
 
 * The fullscreen mode rendering is lag.
 
+* No audio. The engine expects MP3 (especially for Windows porting) but OGG is supplied.
+
 # Touchscreen?
 
 Yes, SIF-Win32 will have touchscreen support. Unfortunately, touchscreen support is available for Windows 7 and above.
+
+# Compiling and installation
+
+1. Grab the latest SIF EN APK and exract file named `AppAssets.zip` in it. v3.1.3 is recommended.
+
+2. Clone this project
+
+3. Compile this project with Visual Studio 2010 Express or above.
+
+4. Navigate to `Engine/Porting/Win32/Output/<Debug|Release>` and copy all DLLs and EXE in that folder to somewhere else. You may also want to copy `libmp3lame.dll` and `libeay32.dll` located somewhere in the project if it's not exist in that folder.
+
+5. In the new location of the exe, create new directory named `install`
+
+6. Extacts the contents of `AppAssets.zip` to `<new executable location>/install` folder
+
+7. Start `SampleProject.exe`
+
+# GameEngineActivity.xml equivalent?
+
+It's named `GE_Keychain.key` in SIF-Win32.
