@@ -252,9 +252,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         case WM_DESTROY:
             PostQuitMessage(0);                                             
             break;
-
-		case WM_SIZE:
-//			_CrtDbgBreak();
         default:                                                            
             return DefWindowProc(hWnd, message, wParam, lParam);            
     }                                                                   
@@ -435,6 +432,10 @@ int GameEngineMain(int argc, _TCHAR* argv[])
 				if (strcmp("-no", argv[parse]) == 0) {
 					if (strcmp("defaultfont", argv[parse+1]) == 0) {
 						hasDefaultFont = false;
+					}
+					else if(strcmp("multicore", argv[parse+1]) == 0)
+					{
+						SetProcessAffinityMask(GetCurrentProcess(), 0x1);
 					}
 				}
 
