@@ -23,6 +23,8 @@ CWin32MP3::CWin32MP3(const char * mp3name)
 , m_hip     (0)
 , m_begin   (NULL)
 , m_end     (NULL)
+, m_is_ogg	(false)
+, m_ogg_buffer(NULL)
 , m_decrypter()
 {
 	// Lame の初期化
@@ -55,6 +57,8 @@ CWin32MP3::~CWin32MP3()
 		lame_close(m_lgf);
 		m_lgf = 0;
 	}
+	if(m_ogg_buffer)
+		delete[] m_ogg_buffer;
 }
 
 bool
@@ -84,6 +88,13 @@ CWin32MP3::getFormat(WAVEFORMATEX * format)
 bool
 CWin32MP3::readData(char * buf, size_t max)
 {
+	if(m_is_ogg)
+	{
+		// Assumed data is max
+		memcpy(buf, m_ogg_buffer, max);
+
+		return true;
+	}
 	short * ptr     = (short *)buf;
 	size_t maxlen   = max / 2;
 
@@ -97,13 +108,16 @@ CWin32MP3::readData(char * buf, size_t max)
 		maxlen  -= size;
 		block   = block->next;
 	}
-    if(block->next) { return false; }
+    if(block && block->next) { return false; }
 	return true;
 }
 
 bool
 CWin32MP3::loadMP3(const char * name)
 {
+	if(strstr(name, ".ogg"))
+		return loadOGG(name);	// Load OGG instead
+
 	const char * soundpath = name;
 	char * pBuf = new char [ FILE_BUF_SIZE ];
 	FILE * rfp;

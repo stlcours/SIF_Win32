@@ -17,9 +17,10 @@
 #include <string.h>
 #include <openssl/md5.h>
 #include "encryptFile.h"
+#include "CPFInterface.h"
 
-/*!
-    @brief  コンストラクタ
+/*
+ * To decrypt SIF files, libHonoka is used
  */
 CDecryptBaseClass::CDecryptBaseClass()
 : m_decrypt	(false)
@@ -51,7 +52,8 @@ inline void updateV2(CDecryptBaseClass* dctx)
     @return     void
  */
 void CDecryptBaseClass::decrypt(void* ptr, u32 length) {
-	// Version 2 encryption. Decrypt
+	// Version 2 encryption. Decrypt.
+	// Copied from libhonoka
 	u8* file_buffer = reinterpret_cast<u8*>(ptr);
 	size_t decrypt_size;
 	
@@ -89,11 +91,7 @@ void CDecryptBaseClass::decrypt(void* ptr, u32 length) {
 #define DECRYPT_KEY "BFd3EnkcKa"
 #define DECRYPT_LEN 10
 
-/*!
-    @brief  複合化準備
-    @param[in]  const u8* ptr   ファイルパス
-    @return     void
- */
+// Uses part of libhonoka 
 u32 CDecryptBaseClass::decryptSetup(const u8* ptr, const u8* hdr) {
 	MD5_CTX* mctx;
 	size_t basename_len;
@@ -132,7 +130,7 @@ u32 CDecryptBaseClass::decryptSetup(const u8* ptr, const u8* hdr) {
 	else
 	{
 		// Version 1. Not implemented = transparent
-		printf("%s: unsupported encryption scheme\n", ptr);
+		DEBUG_PRINT("%s: unsupported encryption scheme\n", ptr);
 
 		m_useNew = false;
 		m_decrypt = false;

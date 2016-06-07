@@ -50,6 +50,8 @@
 
 #include <conio.h>
 
+bool SIF_Win32_IS_RELEASE = true;
+
 //
 //-----------------------------------------
 //
@@ -437,6 +439,8 @@ int GameEngineMain(int argc, _TCHAR* argv[])
 					{
 						SetProcessAffinityMask(GetCurrentProcess(), 0x1);
 					}
+					else if(strcmp("release", argv[parse+1]) == 0)
+						SIF_Win32_IS_RELEASE = false;
 				}
 
 				parse += 2;
