@@ -1933,5 +1933,8 @@
     <ClCompile Include="Win32OGG.cpp">
       <Filter>Platform</Filter>
     </ClCompile>
+    <ClCompile Include="Platform\Win32TouchLib.cpp">
+      <Filter>Platform</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

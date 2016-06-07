@@ -95,7 +95,7 @@ CKLBSWFAsset::CKLBSWFAsset()
 ,m_shapes				(NULL)
 ,m_sounds				(NULL)
 ,m_isMaster				(false)
-,m_msPerFrame			(41)	// around 24 fps default.
+,m_msPerFrame			(16)	// around 60 fps default.
 ,m_uiMovieCount			(0)	
 ,m_uiShapeCount			(0)
 ,m_uiSoundCount			(0)
