@@ -172,6 +172,8 @@ int CKLBLuaLibENG::luaForbidSleep(lua_State * L)
 	return 0;
 }
 
+extern bool SIF_Win32_IS_RELEASE;
+
 bool CKLBLuaLibENG::isRelease()
 {
 #ifndef IS_RELEASE
@@ -200,7 +202,7 @@ bool CKLBLuaLibENG::isRelease()
 	#else
 		return true;
 	#endif
-		return IS_RELEASE;
+		return SIF_Win32_IS_RELEASE;
 }
 
 const char* CKLBLuaLibENG::getPlatform()

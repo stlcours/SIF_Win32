@@ -115,6 +115,12 @@
     <Filter Include="libs\zlib">
       <UniqueIdentifier>{9261f5b7-cbeb-46c3-8907-36b3c62252be}</UniqueIdentifier>
     </Filter>
+    <Filter Include="libs\libogg">
+      <UniqueIdentifier>{5d7b5044-6dca-4eed-ab42-511e00f034ce}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="libs\libvorbis">
+      <UniqueIdentifier>{4df44d7c-589f-4f37-808a-fa1c7228463c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\source\Rendering\shaderSource.inl">
@@ -1850,6 +1856,81 @@
       <Filter>libs\zlib</Filter>
     </ClCompile>
     <ClCompile Include="Platform\Win32LuaLock.cpp">
+      <Filter>Platform</Filter>
+    </ClCompile>
+    <ClCompile Include="libogg\src\bitwise.c">
+      <Filter>libs\libogg</Filter>
+    </ClCompile>
+    <ClCompile Include="libogg\src\framing.c">
+      <Filter>libs\libogg</Filter>
+    </ClCompile>
+    <ClCompile Include="libvorbis\lib\analysis.c">
+      <Filter>libs\libvorbis</Filter>
+    </ClCompile>
+    <ClCompile Include="libvorbis\lib\bitrate.c">
+      <Filter>libs\libvorbis</Filter>
+    </ClCompile>
+    <ClCompile Include="libvorbis\lib\block.c">
+      <Filter>libs\libvorbis</Filter>
+    </ClCompile>
+    <ClCompile Include="libvorbis\lib\codebook.c">
+      <Filter>libs\libvorbis</Filter>
+    </ClCompile>
+    <ClCompile Include="libvorbis\lib\envelope.c">
+      <Filter>libs\libvorbis</Filter>
+    </ClCompile>
+    <ClCompile Include="libvorbis\lib\floor0.c">
+      <Filter>libs\libvorbis</Filter>
+    </ClCompile>
+    <ClCompile Include="libvorbis\lib\floor1.c">
+      <Filter>libs\libvorbis</Filter>
+    </ClCompile>
+    <ClCompile Include="libvorbis\lib\info.c">
+      <Filter>libs\libvorbis</Filter>
+    </ClCompile>
+    <ClCompile Include="libvorbis\lib\lookup.c">
+      <Filter>libs\libvorbis</Filter>
+    </ClCompile>
+    <ClCompile Include="libvorbis\lib\lpc.c">
+      <Filter>libs\libvorbis</Filter>
+    </ClCompile>
+    <ClCompile Include="libvorbis\lib\lsp.c">
+      <Filter>libs\libvorbis</Filter>
+    </ClCompile>
+    <ClCompile Include="libvorbis\lib\mapping0.c">
+      <Filter>libs\libvorbis</Filter>
+    </ClCompile>
+    <ClCompile Include="libvorbis\lib\mdct.c">
+      <Filter>libs\libvorbis</Filter>
+    </ClCompile>
+    <ClCompile Include="libvorbis\lib\psy.c">
+      <Filter>libs\libvorbis</Filter>
+    </ClCompile>
+    <ClCompile Include="libvorbis\lib\registry.c">
+      <Filter>libs\libvorbis</Filter>
+    </ClCompile>
+    <ClCompile Include="libvorbis\lib\res0.c">
+      <Filter>libs\libvorbis</Filter>
+    </ClCompile>
+    <ClCompile Include="libvorbis\lib\sharedbook.c">
+      <Filter>libs\libvorbis</Filter>
+    </ClCompile>
+    <ClCompile Include="libvorbis\lib\smallft.c">
+      <Filter>libs\libvorbis</Filter>
+    </ClCompile>
+    <ClCompile Include="libvorbis\lib\synthesis.c">
+      <Filter>libs\libvorbis</Filter>
+    </ClCompile>
+    <ClCompile Include="libvorbis\lib\vorbisenc.c">
+      <Filter>libs\libvorbis</Filter>
+    </ClCompile>
+    <ClCompile Include="libvorbis\lib\vorbisfile.c">
+      <Filter>libs\libvorbis</Filter>
+    </ClCompile>
+    <ClCompile Include="libvorbis\lib\window.c">
+      <Filter>libs\libvorbis</Filter>
+    </ClCompile>
+    <ClCompile Include="Win32OGG.cpp">
       <Filter>Platform</Filter>
     </ClCompile>
   </ItemGroup>

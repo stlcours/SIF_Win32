@@ -352,6 +352,10 @@ CWin32Audio::openAudio(const char * path)
     CWin32PathConv& pathconv = CWin32PathConv::getInstance();
 //    m_soundPath = pathconv.fullpath(path, ".wav");
     m_soundPath = pathconv.fullpath(path, ".mp3");
+
+	if(m_soundPath == NULL)
+		m_soundPath = pathconv.fullpath(path, ".ogg");
+
 	m_loop_cnt = 0;
 	m_step = STEP_WAIT;
     m_bActive = (m_soundPath) ? true : false;
@@ -738,7 +742,7 @@ CWin32AudioMgr::loadSound(CWin32Audio& audio)
 
 	if(strstr(soundpath, ".wav")) {
 		bResult = loadWAV(audio, &info);
-	} else if(strstr(soundpath, ".mp3")) {
+	} else if(strstr(soundpath, ".mp3") || strstr(soundpath, ".ogg")) {
 		bResult = loadMP3(audio, &info);
 	} else {
 		bResult = false;

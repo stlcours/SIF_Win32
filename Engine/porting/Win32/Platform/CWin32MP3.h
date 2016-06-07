@@ -38,6 +38,7 @@ public:
 
 private:
 	bool loadMP3(const char * name);
+	bool loadOGG(const char * name);
 	bool toRPCM	(short * buf, int frameCount, int stereo, size_t buf_size);
 
 private:
@@ -53,6 +54,7 @@ private:
 		short			buf[ MP3_MAX_SAMPLES * 2 ];
 	};
 
+	bool					m_is_ogg;
 	bool					m_status;
 	lame_global_flags	*	m_lgf;
 	hip_t					m_hip;
@@ -62,6 +64,7 @@ private:
 	MP3BLOCK	*			m_end;
 	short					m_bufL[ MP3_MAX_SAMPLES ];
 	short					m_bufR[ MP3_MAX_SAMPLES ];
+	char		*			m_ogg_buffer;
 	inline u32 decryptSetup(const u8* ptr, const u8* hdr) {
         return m_decrypter.decryptSetup(ptr,hdr);
     }
