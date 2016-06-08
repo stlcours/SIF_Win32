@@ -39,8 +39,22 @@
 // Dirty hack to fix the PfGameService nil error
 int PfGameService(lua_State* L)
 {
+	DEBUG_PRINT("PfGame_Service called");
+	CLuaState(L).print_stack();
 	lua_pushlstring(L, "", 0);
 	return 1;
+}
+
+// Dirty hack to fix the eventNoticing nil error
+int eventNoticing(lua_State* L)
+{
+	if(lua_isstring(L, 1))
+	{
+		lua_pushboolean(L, 1);
+		return 1;
+	}
+	klb_assertAlways("Arg 1 is not string");
+	return 0;
 }
 
 int traceback (lua_State *L) {
@@ -176,6 +190,8 @@ CKLBLuaEnv::setupLuaEnv()
 	// Setup PfGame_Service fix
 	lua_pushcfunction(m_L, &PfGameService);
 	lua_setglobal(m_L, "PfGame_Service");
+	lua_pushcfunction(m_L, &eventNoticing);
+	lua_setglobal(m_L, "eventNoticing");
     
 	// 全てに先駆けて、NULL を定義する
 	lua_pushlightuserdata(m_L, 0);
@@ -306,7 +322,9 @@ CKLBLuaEnv::command(lua_State *L)
 	s64 startCommand = CPFInterface::getInstance().platform().nanotime();
 #endif
 	CKLBTaskMgr::getInstance().setCurrentTask(pTask);
+	lua.lock();
 	int res = pTask->commandScript(lua);
+	lua.unlock();
 	CKLBTaskMgr::getInstance().setCurrentTask(NULL);
 #ifdef INTERNAL_BENCH
 	logTime('F', CPFInterface::getInstance().platform().nanotime() - startCommand, pTask->getClassID());

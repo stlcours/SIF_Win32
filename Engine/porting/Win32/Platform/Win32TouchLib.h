@@ -26,8 +26,11 @@ namespace Win32Touch
 	bool HasTouchCapabilities();
 
 	// Returns list of touch
-	std::vector<TouchPoint> GetTouchList(void* TouchInputHandle, int TouchCount);
+	std::vector<TouchPoint> GetTouchList(HWND Window, void* TouchInputHandle, int TouchCount);
 
 	// Register window for touch capable. Does nothing in Windows Vista and below
 	void RegisterWindowForTouch(HWND Window);
+
+	// Free HTOUCHINPUT
+	void ReleaseTouchHandle(void* TouchInputHandle);
 }

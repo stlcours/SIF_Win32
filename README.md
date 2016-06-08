@@ -1,6 +1,6 @@
 # SIF-Win32
 
-SIF-Win32 is a Windows port of [Love Live! School Idol Festival](http://www.school-fes.klabgames.net/). It uses open-source older Playground engine which is available in [here](http://github.com/KLab/PlaygroundOSS) to make it work. Major modification is also done so that it compatible with latest version of SIF EN (v3.1.3). SIF-Win32 targets Windows XP by default, but it should be compatible with Windows 8.1, even Windows 10.
+SIF-Win32 is a Windows port of [Love Live! School Idol Festival](http://www.school-fes.klabgames.net/). It uses open-source older Playground engine which is available in [here](http://github.com/KLab/PlaygroundOSS) to make it work. Major modification is also done so that it compatible with latest version of SIF EN (v3.1.3). SIF-Win32 targets Windows XP by default, but it should be compatible with Windows 8.1, even Windows 10 and will uses touchscreen capabilities if available in Windows 7 or above.
 
 # Is this emulator?
 
@@ -8,23 +8,25 @@ No. It's a native windows application with size around 5MB and no emulation is u
 
 # Known problems
 
-* Currently the engine is very sensitive to race conditions. A temporary workaround for this is to set the program to run in single-core mode.
+* **The engine is very sensitive to race conditions. A temporary workaround for this is to set the program to run in single-core mode. Even in single-core mode, the game will even sometimes still crash.**
 
-* When extracting, it takes a very long time especially for a big long file. It might be caused by NTFS design.
-
-* The networking API is also not very stable and needs some bit fixing.
+* When extracting, it takes a very long time especially if there many files (about 2K). It might be caused by NTFS design.
 
 * The fullscreen mode rendering is lag.
 
-* No audio. The engine expects MP3 (especially for Windows porting) but OGG is supplied.
+* There are no notes coming when adjusting timing and starting Live Show! (you'll FC instantly instead).
+
+* The audio distorts bit in the very end.
+
+* Pressing `Link` or `Load` in the Settings will crash the game throwing Assert failure.
 
 # Touchscreen?
 
-Yes, SIF-Win32 will have touchscreen support. Unfortunately, touchscreen support is available for Windows 7 and above.
+Yes, SIF-Win32 will have touchscreen support. Touchscreen support is available on devices running at least Windows 7 and capable to do multitouch.
 
 # Compiling and installation
 
-1. Grab the latest SIF EN APK and exract file named `AppAssets.zip` in it. v3.1.3 is recommended.
+1. Grab the latest SIF EN APK and exract file named `AppAssets.zip` in it. v3.1.3 APK is recommended.
 
 2. Clone this project
 
@@ -41,3 +43,17 @@ Yes, SIF-Win32 will have touchscreen support. Unfortunately, touchscreen support
 # GameEngineActivity.xml equivalent?
 
 It's named `GE_Keychain.key` in SIF-Win32.
+
+# Command-line arguments
+
+* `-no release` sets the game to debug mode. Using debug flag with debug build gives many debug output in the console. Debug mode skips the "Bushiroad" splash screen and shows the detailed output when downloading data.
+
+* `-no multicore` sets the game to run in single core mode. Might fix some crashes when used.
+
+* `-maximize 1` sets the game to run in (almost) fullscreen.
+
+# Account Transfer
+
+* When transfering account created in SIF-Win32 to iOS (and possibility vice versa), you don't need to clear loveca.
+
+* When transfering account created in SIF-Win32 to Android, the loveca must be cleared.
