@@ -100,7 +100,7 @@ int map_netapi_fail(int request_type)
 		case NETAPI_SEND:
 			return NETAPIMSG_REQUEST_FAILED;
 		default:
-			return NETAPIMSG_UNKNOWN;
+			return NETAPIMSG_CONNECTION_FAILED;
 	}
 }
 
@@ -165,6 +165,8 @@ void CKLBNetAPI::startUp(int phase, int status_code)
 			form[1] = NULL;
 
 			// Reuse m_http
+			NetworkManager::releaseConnection(m_http);
+			m_http = NetworkManager::createConnection();
 			m_http->reuse();
 			m_http->setForm(form);
 			set_header(m_http, authorize);
@@ -195,6 +197,8 @@ void CKLBNetAPI::startUp(int phase, int status_code)
 			form[1] = NULL;
 
 			// Reuse m_http
+			NetworkManager::releaseConnection(m_http);
+			m_http = NetworkManager::createConnection();
 			m_http->reuse();
 			m_http->setForm(form);
 			set_header(m_http, authorize);
@@ -247,7 +251,9 @@ void CKLBNetAPI::login(int phase, int status_code)
 			form[0] = request_data;
 			form[1] = NULL;
 
-			// reuse http
+			// create new HTTP
+			NetworkManager::releaseConnection(m_http);
+			m_http = NetworkManager::createConnection();
 			m_http->reuse();
 			m_http->setForm(form);
 			set_header(m_http, authorize);
@@ -320,7 +326,7 @@ CKLBNetAPI::execute(u32 deltaT)
 
 	// Check cancel first
 	if (m_canceled) {
-		lua_callback(NETAPIMSG_CONNECTION_CANCELED, -1, NULL);
+		lua_callback(NETAPIMSG_CONNECTION_CANCELED, -1, NULL, m_nonce - 1);
 
 		NetworkManager::releaseConnection(m_http);
 		m_http = NULL;
@@ -391,14 +397,14 @@ CKLBNetAPI::execute(u32 deltaT)
 	}
 
 	if ((m_http->m_threadStop == 1) && (m_http->getHttpState() == -1)) {
-		lua_callback(NETAPIMSG_CONNECTION_FAILED, -1, NULL);
+		lua_callback(map_netapi_fail(m_request_type), -1, NULL, m_nonce - 1);
 		NetworkManager::releaseConnection(m_http);
 		m_http = NULL;
 	}
 
 	// Time out third (after check that valid has arrived)
 	if (m_timestart >= m_timeout) {
-		lua_callback(NETAPIMSG_SERVER_TIMEOUT, -1, NULL);
+		lua_callback(NETAPIMSG_SERVER_TIMEOUT, -1, NULL, m_nonce - 1);
 		NetworkManager::releaseConnection(m_http);
 		m_http = NULL;
 		return;

@@ -62,7 +62,7 @@ namespace Win32Touch
 		return HasTouch = true;
 	}
 
-	std::vector<TouchPoint> GetTouchList(void* input, int count)
+	std::vector<TouchPoint> GetTouchList(HWND hWnd, void* input, int count)
 	{
 		if(HasTouchCapabilities() == false) return std::vector<TouchPoint>();
 
@@ -76,10 +76,11 @@ namespace Win32Touch
 		{
 			TOUCHINPUT& cur = touch_input[i];
 			TouchPoint tp;
+			POINT translated_pos;
 
 			tp.TouchID = cur.dwID;
-			tp.X = TOUCH_COORD_TO_PIXEL(cur.x);
-			tp.Y = TOUCH_COORD_TO_PIXEL(cur.y);
+			translated_pos.x = TOUCH_COORD_TO_PIXEL(cur.x);
+			translated_pos.y = TOUCH_COORD_TO_PIXEL(cur.y);
 
 			if((cur.dwFlags & TOUCHEVENTF_UP) > 0)
 				tp.Type = TouchUp;
@@ -89,6 +90,10 @@ namespace Win32Touch
 				tp.Type = TouchMove;
 			else
 				tp.Type = TouchUnknown;
+
+			ScreenToClient(hWnd, &translated_pos);
+			tp.X = translated_pos.x;
+			tp.Y = translated_pos.y;
 
 			out.push_back(tp);
 		}
@@ -102,5 +107,12 @@ namespace Win32Touch
 
 		RegisterTouchWindow_Wrapper(hWnd, TWF_WANTPALM);
 		printf("RegisterTouchWindow called");
+	}
+
+	void ReleaseTouchHandle(void* handle)
+	{
+		if(HasTouchCapabilities() == false) return;
+
+		CloseTouchInputHandle_Wrapper((HTOUCHINPUT)handle);
 	}
 }

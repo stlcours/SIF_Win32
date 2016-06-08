@@ -24,6 +24,7 @@
 #include "CPFInterface.h"
 ;
 
+static void* task_mutex = NULL;
 
 CKLBRegistedTaskList::CKLBRegistedTaskList()
 : m_begin   (NULL)
@@ -211,6 +212,8 @@ CKLBTaskMgr::CKLBTaskMgr()
     }
     m_lstRemove.begin = m_lstRemove.end = NULL;
     m_lstStage.begin  = m_lstStage.end  = NULL;
+
+	task_mutex = CPFInterface::getInstance().platform().allocMutex();
 }
 
 CKLBTaskMgr::~CKLBTaskMgr() 
@@ -459,6 +462,8 @@ CKLBTaskMgr::dump() {
 bool
 CKLBTaskMgr::execute(u32 deltaT)
 {
+	IPlatformRequest& pf = CPFInterface::getInstance().platform();
+	pf.mutexLock(task_mutex);
     // すべてのタスクを呼び出す前に、削除リストを初期化する。
     m_lstRemove.begin = m_lstRemove.end = NULL;
     
@@ -546,7 +551,7 @@ CKLBTaskMgr::execute(u32 deltaT)
 #endif
 
 	m_currentTask = NULL;
-    
+	pf.mutexUnlock(task_mutex);
     return m_bExit;
 }
 

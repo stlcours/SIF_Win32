@@ -18,6 +18,7 @@
 #include "CKLBUISystem.h"
 #include "CKLBLuaEnv.h"
 #include "CKLBFormGroup.h"
+#include "CPFInterface.h"
 
 CKLBTouchEventUIMgr::CKLBTouchEventUIMgr() : m_pFormBegin(NULL)
 {
@@ -99,7 +100,6 @@ CKLBTouchEventUIMgr::processUI()
 {
 	// bool started = false;
 	CKLBTouchPadQueue& tpq = CKLBTouchPadQueue::getInstance();
-
 #ifdef LOG_EVENT
 	tpq.setProcessing(true);
 #endif

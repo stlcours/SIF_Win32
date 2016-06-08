@@ -101,6 +101,8 @@ bool CWin32MP3::loadOGG(const char* name)
 	char* PCMPos = PCMOut;
 	char* pcm_eof = PCMOut + PCMSize;
 
+	memset(pcm_eof - 128, 0, 128);
+
 	while(true)
 	{
 		int x = min(pcm_eof - PCMPos, 4096);

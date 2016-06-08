@@ -82,6 +82,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <OutDir>$(SolutionDir)Output\$(Configuration)\</OutDir>
     <LibraryPath>$(SolutionDir)openssl/lib;$(SolutionDir)Lame;$(SolutionDir)pure-Lua\;$(SolutionDir)LuaEdit\x86;$(SolutionDir)zlib\;$(SolutionDir)directx;$(LibraryPath)</LibraryPath>
+    <TargetName>$(ProjectName)_Release</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>

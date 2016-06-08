@@ -23,6 +23,8 @@
 #include "EngineStdReference.h"
 #include "Win32TouchLib.h"
 
+#include <map>
+
 #include <assert.h>
 #include <float.h>
 #include <math.h>
@@ -37,6 +39,8 @@
 
 #include "CKLBLuaEnv.h"
 #include "CKLBTouchPad.h"
+
+#define IS_TOUCH ((GetMessageExtraInfo() & 0xFFFFFF00) == 0xFF515700)
 
 // #pragma comment(lib, "GameLibraryWin32.lib")
 
@@ -126,7 +130,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			// DragQueryFile((HDROP)wParam, 0, &fileNameBuff[0], 512);			
 			break;
         case WM_LBUTTONDOWN:
-			if(GetMessageExtraInfo() == 0)
+			if(!IS_TOUCH)
 			{
 				if(mouse_stat) {	// ボタンを押したまま画面外に出た
 					// 最後の座標を使って、無理やり RELEASEを送る
@@ -142,7 +146,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				break;
 			}
 		case WM_MOUSEMOVE:
-			if(GetMessageExtraInfo() == 0)
+			if(!IS_TOUCH)
 			{
 				if (wParam & MK_LBUTTON) {
 					lastX = GET_X_LPARAM(lParam);
@@ -153,7 +157,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				break;
 			}
 		case WM_LBUTTONUP:
-			if(GetMessageExtraInfo() == 0)
+			if(!IS_TOUCH)
 			{
 				CPFInterface::getInstance().client().inputPoint(0, IClientRequest::I_RELEASE,
 						GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
@@ -255,34 +259,41 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			{
 				using namespace Win32Touch;
 
-				TouchInputList touchlist = GetTouchList((void*)lParam, LOWORD(wParam));
+				TouchInputList touchlist = GetTouchList(hWnd, (void*)lParam, LOWORD(wParam));
 				IClientRequest& cr = CPFInterface::getInstance().client();
 
 				for(TouchInputList::iterator i = touchlist.begin(); i != touchlist.end(); i++)
 				{
 					TouchPoint& cur = *i;
-					IClientRequest::INPUT_TYPE type;
+					
+					DEBUG_PRINT("TouchID = %d; X = %d; Y = %d; Type = %d", cur.TouchID, cur.X, cur.Y, int(cur.Type));
 
 					switch(cur.Type)
 					{
 						case TouchDown:
-							type = IClientRequest::I_CLICK;
-							break;
+							{
+								cr.inputPoint(cur.TouchID, IClientRequest::I_CLICK, cur.X, cur.Y);
+								break;
+							}
 						case TouchUp:
-							type = IClientRequest::I_RELEASE;
-							break;
+							{
+								cr.inputPoint(cur.TouchID, IClientRequest::I_RELEASE, cur.X, cur.Y);
+								break;
+							}
 						case TouchMove:
-							type = IClientRequest::I_DRAG;
-							break;
+							{
+								cr.inputPoint(cur.TouchID, IClientRequest::I_DRAG, cur.X, cur.Y);
+								break;
+							}
 						default:
 							klb_assertAlways("Unknown touch type. TouchID = %d", cur.TouchID);
 							break;
 					}
-					DEBUG_PRINT("TouchID = %d; X = %d; Y = %d; Type = %d", cur.TouchID, cur.X, cur.Y, int(cur.Type));
-					cr.inputPoint(cur.TouchID, type, cur.X, cur.Y);
 				}
+
+				ReleaseTouchHandle((void*)lParam);
 			}
-			// Does not break;
+			break;
         default:                                                            
             return DefWindowProc(hWnd, message, wParam, lParam);            
     }                                                                   
