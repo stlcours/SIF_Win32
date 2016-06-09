@@ -41,7 +41,7 @@ int PfGameService(lua_State* L)
 {
 	DEBUG_PRINT("PfGame_Service called");
 	CLuaState(L).print_stack();
-	lua_pushlstring(L, "", 0);
+	lua_pushlstring(L, "impossible_feature_PfGame_Service", 0);
 	return 1;
 }
 
@@ -314,6 +314,16 @@ CKLBLuaEnv::command(lua_State *L)
         env.errMsg("Target TASK not given to sysCommand() function.");
         return 0;
     }
+	
+	// Check if first argument is string and not real task
+	if(lua.isString(1))
+	{
+		const char* syscommand_cmd = lua.getString(1);
+
+		if(*syscommand_cmd == 0) return 0;	// Do nothing if empty string
+
+		if(IsDebuggerPresent()) DebugBreak();
+	}
     CKLBLuaTask * pTask = (CKLBLuaTask *)lua.getPointer(1);
     if(!pTask) return 0;
 	CHECKTASK(pTask);

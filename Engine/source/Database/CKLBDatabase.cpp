@@ -254,7 +254,7 @@ int fEncryptOpen					(sqlite3_vfs* vfs, const char *zName, sqlite3_file* file, i
 												|| eType == SQLITE_OPEN_SUBJOURNAL
 												|| eType == SQLITE_OPEN_WAL
 												));
-
+	/*
 	if (isOpenJournal) {
 		// No-Operation
 		fileDecrypt->m_no_op	= true;
@@ -264,7 +264,7 @@ int fEncryptOpen					(sqlite3_vfs* vfs, const char *zName, sqlite3_file* file, i
 	} else {
 		fileDecrypt->m_no_op	= false;
 	}
-
+	*/
 	/* Check the following statements are true: 
 	**
 	**   (a) Exactly one of the READWRITE and READONLY flags must be set, and 
