@@ -147,7 +147,7 @@
     <None Include="..\..\source\Rendering\shaderSource.inl" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\Projects\WorldTest\CWorldTask.h" />
+    <!--<ClInclude Include="..\..\..\Projects\WorldTest\CWorldTask.h" />!-->
     <ClInclude Include="..\..\include\BaseType.h" />
     <ClInclude Include="..\..\include\FileSystem.h" />
     <ClInclude Include="..\..\include\ITmpFile.h" />
@@ -178,7 +178,7 @@
     <ClInclude Include="..\..\source\Assets\CKLBAsset.h" />
     <ClInclude Include="..\..\source\Assets\CKLBPropertyBag.h" />
     <ClInclude Include="..\..\source\Assets\CKLBTexturePacker.h" />
-    <ClInclude Include="..\..\source\Assets\MapManagement.h" />
+    <!--<ClInclude Include="..\..\source\Assets\MapManagement.h" />!-->
     <ClInclude Include="..\..\source\Assets\NodeAnimationAsset.h" />
     <ClInclude Include="..\..\source\Assets\TextureManagement.h" />
     <ClInclude Include="..\..\source\Core\ArrayAllocator.h" />
@@ -201,7 +201,7 @@
     <ClInclude Include="..\..\source\Core\CLuaState.h" />
     <ClInclude Include="..\..\source\Core\DebugAlloc.h" />
     <ClInclude Include="..\..\source\Core\DebugTracker.h" />
-    <ClInclude Include="..\..\source\Core\yasper.h" />
+    <!--<ClInclude Include="..\..\source\Core\yasper.h" />!-->
     <ClInclude Include="..\..\source\Database\CKLBDatabase.h" />
     <ClInclude Include="..\..\source\Database\CKLBLanguageDatabase.h" />
     <ClInclude Include="..\..\source\Database\CKLBLuaDB.h" />
@@ -284,7 +284,7 @@
     <ClInclude Include="..\..\source\UISystem\CKLBUIWebArea.h" />
     <ClInclude Include="..\..\source\UISystem\CKLBWebViewNode.h" />
     <ClInclude Include="..\..\source\UISystem\IMgrEntry.h" />
-    <ClInclude Include="..\..\source\UnitSystem\UnitSystem.h" />
+    <!--<ClInclude Include="..\..\source\UnitSystem\UnitSystem.h" />!-->
     <ClInclude Include="EngineStdReference.h" />
     <ClInclude Include="GameEngine.h" />
     <ClInclude Include="Lame\BladeMP3EncDLL.h" />
