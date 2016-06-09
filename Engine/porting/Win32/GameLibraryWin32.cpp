@@ -185,24 +185,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				break;
 			case VK_DOWN:
 				break;
-			case VK_F1:	// F1
-				{
-					static const char* eventList = NULL;
-					if (!eventList) {
-						FILE* f = fopen("EventLog.txt","rb");
-						fseek (f, 0, SEEK_END);   // non-portable
-						int size=ftell (f);
-						u8* buff  = new u8[size+1];
-						memset(buff, 0, size+1);
-						fseek (f, 0, SEEK_SET);
-						fread (buff,1,size,f);
-						fclose(f);
-						eventList = (const char*)buff;
-					}
-					gsrc = eventList;
-				}
-
-				break;
 			case VK_F9:
 				if (g_bRenderChange) {
 					g_bRender++;
@@ -234,7 +216,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 					CPFInterface::getInstance().client().executeCommand("RELOAD");
 				}
 				break;
-			case VK_F8:
+			case VK_BACK:
 				{
 					CPFInterface::getInstance().client().inputDeviceKey(IClientRequest::KEY_BACK, IClientRequest::KEYEVENT_CLICK);
 					break;
@@ -645,7 +627,11 @@ int GameEngineMain(int argc, _TCHAR* argv[])
 						// Rendering complete.
 						//		
 						//testCodeLoop(delta);
-						pClient.frameFlip(fixedDelta ? fixedDelta : delta);
+						if (pClient.frameFlip(fixedDelta ? fixedDelta : delta) == false)
+						{
+							// Exit game
+							quit = true;
+						}
 
 						// pfIF.platform().flipFrame();
 						SwapBuffers( hDC );

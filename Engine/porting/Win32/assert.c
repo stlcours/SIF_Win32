@@ -33,7 +33,7 @@ void assertFunction(int line, const char* file, const char* msg,...) {
 
 	MessageBox(hWnd , log, "Assert", MB_OK);
 #ifndef DEBUG_TOOL_EXTERNAL
-	DebugBreak();
+	if(IsDebuggerPresent()) DebugBreak();
 #else
 	exit(1);
 #endif
