@@ -2,6 +2,7 @@
 
 #include "CWin32MP3.h"
 #include "CWin32Platform.h"
+#include "CSoundAnalysis.h"
 
 #include <vorbis/codec.h>
 #include <vorbis/vorbisfile.h>
@@ -50,6 +51,53 @@ long Win32OGG_Tell(void* fh)
 
 ov_callbacks Win32OGG_Callbacks = {&Win32OGG_Read, &Win32OGG_Seek, NULL, &Win32OGG_Tell};
 //ov_callbacks Win32OGG_Callbacks = {&Win32OGG_Read, NULL, NULL, NULL};
+
+bool SoundAnalysis_OGG(const char* path, sSoundAnalysisData* analysis_data)
+{
+	CDecryptBaseClass decrypter;
+	Win32OGG_DecoderS decoder;
+	OggVorbis_File vf;
+	FILE* fp;
+	
+	fp = fopen(path, "rb");
+
+	if(fp == NULL)
+		return false;
+
+	// Setup decrypter and variables
+	if(CPFInterface::getInstance().platform().useEncryption())
+	{
+		u8 hdr[4];
+		fread(hdr, 1, 4, fp);
+
+		if(decrypter.decryptSetup((const u8*)path, hdr) == 0)
+			fseek(fp, 0, SEEK_SET);
+	}
+
+	decoder.fp = fp;
+	decoder.dctx = &decrypter;
+
+	if(ov_open_callbacks(&decoder, &vf, NULL, 0, Win32OGG_Callbacks) < 0)
+	{
+		fclose(fp);
+		return false;
+	}
+
+	vorbis_info* vi = ov_info(&vf, -1);
+	ogg_int64_t pcm_size = ov_pcm_total(&vf, -1);
+
+	if(vi->bitrate_lower != vi->bitrate_upper)
+
+	analysis_data->m_bitRate = vi->bitrate_nominal / 1000;
+	analysis_data->m_bitRateType = vi->bitrate_lower != vi->bitrate_upper ? eBITRATE_TYPE_VBR : eBITRATE_TYPE_CBR;
+	analysis_data->m_samplingRate = vi->rate;
+	analysis_data->m_totalTime = pcm_size * 1000 / vi->rate;
+
+	ov_clear(&vf);
+	fclose(fp);
+
+	return true;
+}
 
 bool CWin32MP3::loadOGG(const char* name)
 {
@@ -131,45 +179,6 @@ bool CWin32MP3::loadOGG(const char* name)
 	m_ogg_buffer = PCMOut;
 
 	ov_clear(&vf);
-	fclose(fp);
-
-	/*
-	// Convert to MP3BLOCK
-	for(char* i = PCMOut; i < pcm_eof; i += PCM_BUF_SIZE)
-	{
-		size_t copy_size = min(pcm_eof - i, PCM_BUF_SIZE);
-		MP3BLOCK* block = new MP3BLOCK;
-
-		m_totalSize += copy_size;
-		block->size = copy_size / 2;
-		block->prev = m_end;
-		block->next = NULL;
-		if(block->prev)
-			block->prev->next = block;
-		else
-			m_begin = block;
-		m_end = block;
-
-		memcpy(block->buf, i, copy_size);
-	}
-
-	// Sanity check
-	{
-		size_t total_size = 0;
-		MP3BLOCK* cur = m_begin;
-
-		while(true)
-		{
-			total_size += cur->size;
-
-			if(cur->next == NULL) break;
-			else cur = cur->next;
-		}
-
-		klb_assert(total_size * 2 == m_totalSize, "m_totalSize = %d; total_size = %d", int(m_totalSize), int(total_size));
-		//m_totalSize = total_size;
-	}
-	*/
 
 	return true;
 }
