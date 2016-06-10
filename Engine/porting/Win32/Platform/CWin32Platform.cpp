@@ -192,7 +192,7 @@ CWin32Platform::nanotime()
 	return val;
 }
 
-#define LATEST_APK_VERSION "3.1.4"
+#define LATEST_APK_VERSION "3.1.3"
 
 const char*
 CWin32Platform::getBundleVersion() {

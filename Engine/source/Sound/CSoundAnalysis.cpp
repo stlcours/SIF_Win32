@@ -22,6 +22,8 @@
 #include "CSoundAnalysis.h"
 #include "CSoundAnalysisMP3.h"
 
+bool SoundAnalysis_OGG(const char*, sSoundAnalysisData* );
+
 /*
  @brief  サウンドファイルのいろいろな情報を取得
  @param[in]     const char* _path          サウンドファイル名
@@ -43,6 +45,7 @@ bool GetSoundAnalysisData( const char* _path, sSoundAnalysisData* _data )
     else if( strstr(_path, ".ogg") )
     {
         // OGG
+		bAnalysis = SoundAnalysis_OGG(_path, _data);
     }
     
     return bAnalysis;
