@@ -1018,8 +1018,6 @@
     <ClCompile Include="..\..\source\Rendering\glWrapper.cpp" />
     <ClCompile Include="..\..\source\SceneGraph\CKLBNode.cpp" />
     <ClCompile Include="..\..\source\Scripting\CKLBGCTask.cpp" />
-    <ClCompile Include="..\..\source\Scripting\CKLBScriptEnv_forCpp.cpp" />
-    <ClCompile Include="..\..\source\Scripting\CKLBScriptEnv_forCSharp.cpp" />
     <ClCompile Include="..\..\source\Scripting\CKLBScriptEnv_forLUA.cpp" />
     <ClCompile Include="..\..\source\Sound\CSoundAnalysis.cpp" />
     <ClCompile Include="..\..\source\Sound\CSoundAnalysisMP3.cpp" />

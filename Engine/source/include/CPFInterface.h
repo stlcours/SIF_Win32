@@ -737,4 +737,7 @@ public:
 	inline bool isPlatform	() const { return (m_pPlatform != 0);	}
 };
 
+#define MUTEX_LOCK(x) CPFInterface::getInstance().platform().mutexLock(x);
+#define MUTEX_UNLOCK(x) CPFInterface::getInstance().platform().mutexUnlock(x);
+
 #endif // CPFInterface_h

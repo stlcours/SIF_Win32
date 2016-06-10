@@ -37,7 +37,7 @@ public:
 	SFormCtrlList * searchCtrl(CKLBUISelectable * pCtrl);
 
 	enum {
-		MAX_TOUCH_POINT = 10,
+		MAX_TOUCH_POINT = 64,
 		MV_BORDER = 20	// TAPからこのpixel数以上DRAGしたら、クリック操作ではないと判断
 	};
 private:
