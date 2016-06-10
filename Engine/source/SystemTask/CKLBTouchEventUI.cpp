@@ -20,6 +20,8 @@
 #include "CKLBFormGroup.h"
 #include "CPFInterface.h"
 
+extern void* CKLBTouchPad_Mutex;
+
 CKLBTouchEventUIMgr::CKLBTouchEventUIMgr() : m_pFormBegin(NULL)
 {
 	for(int i = 0; i < MAX_TOUCH_POINT; i++) m_pTarget[i] = 0;
@@ -30,6 +32,7 @@ CKLBTouchEventUIMgr&
 CKLBTouchEventUIMgr::getInstance()
 {
 	static CKLBTouchEventUIMgr instance;
+	CKLBTouchPad_Mutex = CKLBTouchPad_Mutex ? CKLBTouchPad_Mutex : CPFInterface::getInstance().platform().allocMutex();
 	return instance;
 }
 
@@ -265,7 +268,7 @@ CKLBTouchEventUIMgr::processUI()
 																m_tapPos[item->id].x,
 																m_tapPos[item->id].y,
 																mv_x, mv_y);
-							} else if(pList->nativeCallback) {
+							} else if(pList && pList->nativeCallback) {
 								pList->nativeCallback(pList->pID,
 														item->type,
 														m_tapPos[item->id].x,
@@ -340,8 +343,10 @@ void
 CKLBTouchEventUITask::execute(u32 /*deltaT*/)
 {
 	CKLBTouchEventUIMgr& mgr = CKLBTouchEventUIMgr::getInstance();
-
+	
+	MUTEX_LOCK(CKLBTouchPad_Mutex);
 	mgr.processUI();
+	MUTEX_UNLOCK(CKLBTouchPad_Mutex);
 }
 
 void

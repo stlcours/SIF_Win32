@@ -20,6 +20,8 @@
 #include "CKLBTouchPad.h"
 #include "CKLBDrawTask.h"
 
+void* CKLBTouchPad_Mutex = NULL;
+
 CKLBTouchPadQueue::CKLBTouchPadQueue()
 	: m_begin(0), m_read(0), m_rec(0), m_get(0), m_bDoingProcess(false), m_ignoreOutScreen(false), m_maskIgnoreFinger(0)
 {
@@ -29,11 +31,13 @@ CKLBTouchPadQueue::CKLBTouchPadQueue()
     };
     setConvertMatrix(matrix);
 }
-CKLBTouchPadQueue::~CKLBTouchPadQueue() {}
+CKLBTouchPadQueue::~CKLBTouchPadQueue() {
+}
 
 CKLBTouchPadQueue&
 CKLBTouchPadQueue::getInstance() {
     static CKLBTouchPadQueue instance;
+	CKLBTouchPad_Mutex = CKLBTouchPad_Mutex ? CKLBTouchPad_Mutex : CPFInterface::getInstance().platform().allocMutex();
     return instance;
 }
 
@@ -45,6 +49,8 @@ CKLBTouchPadQueue::addQueue(int id, IClientRequest::INPUT_TYPE gtype, int x, int
 
     // 一つ手前なので記録上限と看做す
     if(next == m_read) return;
+
+	MUTEX_LOCK(CKLBTouchPad_Mutex);
 
     PAD_ITEM::TYPE type = (PAD_ITEM::TYPE)gtype;
 
@@ -117,6 +123,8 @@ CKLBTouchPadQueue::addQueue(int id, IClientRequest::INPUT_TYPE gtype, int x, int
 	}
 #endif
     m_rec = next;
+
+	MUTEX_UNLOCK(CKLBTouchPad_Mutex);
 }
 
 void

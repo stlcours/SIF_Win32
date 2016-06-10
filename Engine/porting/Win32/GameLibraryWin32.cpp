@@ -126,21 +126,19 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				CWin32Widget::ControlCommand(hWnd, message, wParam, lParam);
 			}
 			break;
-		case WM_DROPFILES:
-			// DragQueryFile((HDROP)wParam, 0, &fileNameBuff[0], 512);			
-			break;
         case WM_LBUTTONDOWN:
 			if(!IS_TOUCH)
 			{
-				if(mouse_stat) {	// ボタンを押したまま画面外に出た
+				if(mouse_stat) {
+					// ボタンを押したまま画面外に出た
 					// 最後の座標を使って、無理やり RELEASEを送る
 					// If going out of the screen with a pushed button
 					// Force sending a RELEASE signal.
-					CPFInterface::getInstance().client().inputPoint(0, IClientRequest::I_RELEASE,
+					CPFInterface::getInstance().client().inputPoint(63, IClientRequest::I_RELEASE,
 							lastX, lastY);
 					mouse_stat = 0;
 				}
-				CPFInterface::getInstance().client().inputPoint(0, IClientRequest::I_CLICK,
+				CPFInterface::getInstance().client().inputPoint(63, IClientRequest::I_CLICK,
 						GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
 				mouse_stat = 1;
 				break;
@@ -151,7 +149,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				if (wParam & MK_LBUTTON) {
 					lastX = GET_X_LPARAM(lParam);
 					lastY = GET_Y_LPARAM(lParam);
-					CPFInterface::getInstance().client().inputPoint(0, IClientRequest::I_DRAG,
+					CPFInterface::getInstance().client().inputPoint(63, IClientRequest::I_DRAG,
 							lastX, lastY);
 				}
 				break;
@@ -159,7 +157,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		case WM_LBUTTONUP:
 			if(!IS_TOUCH)
 			{
-				CPFInterface::getInstance().client().inputPoint(0, IClientRequest::I_RELEASE,
+				CPFInterface::getInstance().client().inputPoint(63, IClientRequest::I_RELEASE,
 						GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
 				mouse_stat = 0;
 				break;
@@ -529,7 +527,6 @@ int GameEngineMain(int argc, _TCHAR* argv[])
 	// COM Initialization
 	CoInitialize(NULL);
 	EnableWindow(hwnd, TRUE);
-	DragAcceptFiles(hwnd, true);
 
 	// Register touch window
 	Win32Touch::RegisterWindowForTouch(hwnd);

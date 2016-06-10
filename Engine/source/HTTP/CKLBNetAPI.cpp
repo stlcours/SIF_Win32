@@ -349,17 +349,21 @@ CKLBNetAPI::execute(u32 deltaT)
 
 		if(m_http->isMaintenance())
 		{
-			// TODO: Tell the game that server is maintenance
+			NetworkManager::releaseConnection(m_http);
+			m_http = NULL;
+
+			CKLBLuaEnv::getInstance().intoMaintenance();
+			return;
 		}
 
 		//
 		// Support only JSon for callback
 		// 
 		freeJSonResult();
-		m_pRoot = getJsonTree((const char*)body, bodyLen);
 		
 		if(invalid == false)
 		{
+			if(state == 200 || state == 600) m_pRoot = getJsonTree((const char*)body, bodyLen);
 			m_nonce++;	// Increase nonce if request success.
 
 			if(m_request_type == NETAPI_STARTUP)

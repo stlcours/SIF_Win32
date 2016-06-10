@@ -5,6 +5,8 @@
 #include "CPFInterface.h"
 #include "Win32TouchLib.h"
 
+#define WIN32TOUCH_MAX_TOUCH 10
+
 namespace Win32Touch
 {
 	typedef BOOL(WINAPI * WinApiGetTouchInfo)(HTOUCHINPUT hTouchInput, UINT cInputs, PTOUCHINPUT pInputs, int cbSize);
@@ -16,6 +18,7 @@ namespace Win32Touch
 	WinApiCloseTouchInputHandle CloseTouchInputHandle_Wrapper = NULL;
 
 	bool HasTouch = false;
+	DWORD touchIDMap[WIN32TOUCH_MAX_TOUCH];
 
 	bool HasTouchCapabilities()
 	{
@@ -24,6 +27,7 @@ namespace Win32Touch
 		if(AlreadyHere) return HasTouch;
 
 		AlreadyHere = true;
+		memset(touchIDMap, 0, WIN32TOUCH_MAX_TOUCH * sizeof(DWORD));
 
 		OSVERSIONINFOA osinfo;
 
@@ -77,19 +81,64 @@ namespace Win32Touch
 			TOUCHINPUT& cur = touch_input[i];
 			TouchPoint tp;
 			POINT translated_pos;
+			bool isOK = false;
 
-			tp.TouchID = cur.dwID;
 			translated_pos.x = TOUCH_COORD_TO_PIXEL(cur.x);
 			translated_pos.y = TOUCH_COORD_TO_PIXEL(cur.y);
 
 			if((cur.dwFlags & TOUCHEVENTF_UP) > 0)
-				tp.Type = TouchUp;
+			{
+				for(int j = 0; j < WIN32TOUCH_MAX_TOUCH; j++)
+				{
+					DWORD& IDMap = touchIDMap[j];
+
+					if(IDMap == cur.dwID)
+					{
+						tp.Type = TouchUp;
+						tp.TouchID = j;
+						IDMap = 0;
+						isOK = true;
+
+						break;
+					}
+				}
+			}
 			else if((cur.dwFlags & TOUCHEVENTF_DOWN) > 0)
-				tp.Type = TouchDown;
+			{
+				for(int j = 0; j < WIN32TOUCH_MAX_TOUCH; j++)
+				{
+					DWORD& IDMap = touchIDMap[j];
+
+					if(IDMap == 0)
+					{
+						tp.Type = TouchDown;
+						tp.TouchID = j;
+						IDMap = cur.dwID;
+						isOK = true;
+
+						break;
+					}
+				}
+			}
 			else if((cur.dwFlags & TOUCHEVENTF_MOVE) > 0)
-				tp.Type = TouchMove;
+			{
+				for(int j = 0; j < WIN32TOUCH_MAX_TOUCH; j++)
+				{
+					DWORD& IDMap = touchIDMap[j];
+
+					if(IDMap == cur.dwID)
+					{
+						tp.Type = TouchMove;
+						tp.TouchID = j;
+						isOK = true;
+					}
+				}
+			}
 			else
 				tp.Type = TouchUnknown;
+
+			if(isOK == false)
+				continue;
 
 			ScreenToClient(hWnd, &translated_pos);
 			tp.X = translated_pos.x;
