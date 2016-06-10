@@ -177,6 +177,7 @@ bool CWin32MP3::loadOGG(const char* name)
 	m_ogg_buffer = PCMOut;
 
 	ov_clear(&vf);
+	fclose(fp);
 
 	return true;
 }
