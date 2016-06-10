@@ -86,8 +86,6 @@ bool SoundAnalysis_OGG(const char* path, sSoundAnalysisData* analysis_data)
 	vorbis_info* vi = ov_info(&vf, -1);
 	ogg_int64_t pcm_size = ov_pcm_total(&vf, -1);
 
-	if(vi->bitrate_lower != vi->bitrate_upper)
-
 	analysis_data->m_bitRate = vi->bitrate_nominal / 1000;
 	analysis_data->m_bitRateType = vi->bitrate_lower != vi->bitrate_upper ? eBITRATE_TYPE_VBR : eBITRATE_TYPE_CBR;
 	analysis_data->m_samplingRate = vi->rate;
