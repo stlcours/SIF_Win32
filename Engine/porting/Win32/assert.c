@@ -31,12 +31,9 @@ void assertFunction(int line, const char* file, const char* msg,...) {
 
 	sprintf_s( log,1024, "Assert l.%i in %s : \n%s\n",line, file, pszBuf); 
 
-	MessageBox(hWnd , log, "Assert", MB_OK);
-#ifndef DEBUG_TOOL_EXTERNAL
+	MessageBox(hWnd , log, "Assert", MB_OK | MB_ICONEXCLAMATION);
 	if(IsDebuggerPresent()) DebugBreak();
-#else
-	exit(1);
-#endif
+	else exit(1);
 }
 
 void msgBox(char* log) {

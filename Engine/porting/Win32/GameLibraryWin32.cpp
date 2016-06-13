@@ -526,6 +526,7 @@ int GameEngineMain(int argc, _TCHAR* argv[])
 
 	// COM Initialization
 	CoInitialize(NULL);
+	OleInitialize(NULL);
 	EnableWindow(hwnd, TRUE);
 
 	// Register touch window
@@ -638,7 +639,7 @@ int GameEngineMain(int argc, _TCHAR* argv[])
 					CWin32Widget::ReDrawControls();
 				}
 			}
-			Sleep(1);
+			//Sleep(1);
 		}
 	}
 
@@ -654,6 +655,7 @@ int GameEngineMain(int argc, _TCHAR* argv[])
 	CWin32AudioMgr::getInstance().release();
 
 	// End of COM
+	OleUninitialize();
 	CoUninitialize();
 
 	if(DestroyWindow (hwnd)) {

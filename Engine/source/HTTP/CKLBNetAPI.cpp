@@ -344,7 +344,7 @@ CKLBNetAPI::execute(u32 deltaT)
 		// Get Status Code
 		CKLBNetAPIKeyChain& kc = CKLBNetAPIKeyChain::getInstance();
 		int state = m_http->getHttpState();
-		bool invalid = ((state >= 500) && (state <= 599)) || (state == 204);
+		bool invalid = ((state >= 400) && (state <= 599)) || (state == 204);
 		int msg = invalid == false ? NETAPIMSG_REQUEST_SUCCESS : NETAPIMSG_SERVER_ERROR;
 
 		if(m_http->isMaintenance())
@@ -400,15 +400,17 @@ CKLBNetAPI::execute(u32 deltaT)
 		return;
 	}
 
+	
+
 	if ((m_http->m_threadStop == 1) && (m_http->getHttpState() == -1)) {
-		lua_callback(map_netapi_fail(m_request_type), -1, NULL, m_nonce - 1);
+		lua_callback(map_netapi_fail(m_request_type), -1, NULL, m_nonce);
 		NetworkManager::releaseConnection(m_http);
 		m_http = NULL;
 	}
 
 	// Time out third (after check that valid has arrived)
 	if (m_timestart >= m_timeout) {
-		lua_callback(NETAPIMSG_SERVER_TIMEOUT, -1, NULL, m_nonce - 1);
+		lua_callback(NETAPIMSG_SERVER_TIMEOUT, -1, NULL, m_nonce);
 		NetworkManager::releaseConnection(m_http);
 		m_http = NULL;
 		return;
