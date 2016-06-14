@@ -17,6 +17,12 @@
 #include "CKLBObject.h"
 #include "KLBPlatformMetrics.h"
 ;
+
+extern POINT logical_touch_pos[9];
+extern POINT physical_touch_pos[9];
+
+void logical_to_physical(const POINT* , POINT* );
+
 CKLBDrawResource::CKLBDrawResource()
 :m_allowLog		(false)
 ,m_frameCount	(0)
@@ -93,6 +99,11 @@ CKLBDrawResource::setLogicalResolution(int width, int height, float * other_matr
 
 	dglClearColor(1.0f, 0.7f, 0.2039f, 1.0f);
 	dglDisable( GL_CULL_FACE );
+
+	// In case if the screen resolution is updated
+	// Update the keyboard physical screen coordinates too
+	for(int i = 0; i < 9; i++)
+		logical_to_physical(&logical_touch_pos[i], &physical_touch_pos[i]);
 
 	return bResult;
 }

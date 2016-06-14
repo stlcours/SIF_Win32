@@ -6,23 +6,23 @@ SIF-Win32 is a Windows port of [Love Live! School Idol Festival](http://www.scho
 
 No. It's a native windows application with size around 5MB and no emulation is used here. Because no emulation is used and it's native Windows applicaion, SIF can run in full speed compared when using any Android emulator.
 
+**Although the executable size is 5MB, the SIF install data is 50MB and the external data is around 1GB.**
+
 # Known problems
 
-* **The engine is very sensitive to race conditions. A temporary workaround for this is to set the program to run in single-core mode. Even in single-core mode, the game will even sometimes still crash.**
+* **The engine is very sensitive to race conditions. A temporary workaround for this is to set the program to run in single-core mode.**
 
-* When extracting, it takes a very long time especially if there many files (about 2K). It might be caused by NTFS design.
+* When extracting many empty files, it takes very long time. It might be caused by NTFS design.
 
-* The fullscreen mode rendering is lag.
-
-* There are no notes coming when adjusting timing and starting Live Show! (you'll FC instantly instead).
-
-* The audio distorts bit in the very end.
-
-* Pressing `Link` or `Load` in the Settings will crash the game throwing Assert failure.
+* Audio volume slider in Settings doesn't work.
 
 # Touchscreen?
 
-Yes, SIF-Win32 will have touchscreen support. Touchscreen support is available on devices running at least Windows 7 and capable to do multitouch.
+Yes, SIF-Win32 have touchscreen support. Touchscreen support is available on devices running at least Windows 7 and capable to do multitouch.
+
+# Keyboard support?
+
+Yes, SIF-Win32 also have keyboard support. The keys is configureable.
 
 # Compiling and installation
 
@@ -32,7 +32,7 @@ Yes, SIF-Win32 will have touchscreen support. Touchscreen support is available o
 
 3. Compile this project with Visual Studio 2010 Express or above.
 
-4. Navigate to `Engine/Porting/Win32/Output/<Debug|Release>` and copy all DLLs and EXE in that folder to somewhere else. You may also want to copy `libmp3lame.dll` and `libeay32.dll` located somewhere in the project if it's not exist in that folder.
+4. Navigate to `Engine/Porting/Win32/Output/<Debug|Release>` and copy all DLLs and EXE in that folder to somewhere else. You may also want to copy `libmp3lame.dll` and `libeay32.dll` located somewhere in the project if it's not exist in that folder. Also copy `SIF-Win32.json` in `Engine/Porting/Win32` folder.
 
 5. In the new location of the exe, create new directory named `install`
 

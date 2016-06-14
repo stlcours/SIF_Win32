@@ -13,17 +13,11 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="Source Files\Rendering">
-      <UniqueIdentifier>{191477fc-ce36-4230-8560-bd63e3c948e4}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\SceneGraph">
       <UniqueIdentifier>{f8bcf784-9896-4ff3-870c-d2c50e880f80}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\Assets">
       <UniqueIdentifier>{2e2c5026-ce5b-435a-9f66-02fe68eeb687}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Rendering\OpenGLWrapper">
-      <UniqueIdentifier>{1826bcbc-029a-46a7-b49d-1fdfe6592ed2}</UniqueIdentifier>
     </Filter>
     <Filter Include="Platform">
       <UniqueIdentifier>{81d99951-9458-45ca-8d66-667016001819}</UniqueIdentifier>
@@ -109,9 +103,6 @@
     <Filter Include="libs\sha1">
       <UniqueIdentifier>{9bbe57f9-d7c4-4903-aa44-22a0551ecaaa}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Rendering\Font">
-      <UniqueIdentifier>{052c5c2d-5ab4-4d1a-bec4-dfa3854f63f3}</UniqueIdentifier>
-    </Filter>
     <Filter Include="libs\zlib">
       <UniqueIdentifier>{9261f5b7-cbeb-46c3-8907-36b3c62252be}</UniqueIdentifier>
     </Filter>
@@ -120,6 +111,15 @@
     </Filter>
     <Filter Include="libs\libvorbis">
       <UniqueIdentifier>{4df44d7c-589f-4f37-808a-fa1c7228463c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Rendering">
+      <UniqueIdentifier>{191477fc-ce36-4230-8560-bd63e3c948e4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Rendering\OpenGLWrapper">
+      <UniqueIdentifier>{1826bcbc-029a-46a7-b49d-1fdfe6592ed2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Rendering\Font">
+      <UniqueIdentifier>{052c5c2d-5ab4-4d1a-bec4-dfa3854f63f3}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
