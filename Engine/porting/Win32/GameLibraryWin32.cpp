@@ -598,6 +598,9 @@ int GameEngineMain(int argc, _TCHAR* argv[])
 	}
 	pfif.client().setScreenInfo(false, WIDTH, HEIGHT);
 
+	// Register for touch
+	if(SIF_Win32::AllowTouchscreen) Win32Touch::RegisterWindowForTouch(hwnd);
+
 	// boot path
 	if (strlen(g_fileName)) {
 		pfif.client().setFilePath(g_fileName);
