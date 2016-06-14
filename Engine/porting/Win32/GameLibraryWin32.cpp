@@ -22,6 +22,7 @@
 #include "GameEngine.h"
 #include "EngineStdReference.h"
 #include "Win32TouchLib.h"
+#include "SIF_Win32.h"
 
 #include <map>
 
@@ -56,6 +57,46 @@
 #include <conio.h>
 
 bool SIF_Win32_IS_RELEASE = true;
+bool OVERRIDE_IS_RELEASE = false;
+bool SIF_Win32_IS_SINGLECORE = false;
+bool OVERRIDE_IS_SINGECORE = false;
+
+POINT logical_touch_pos[9] = {
+	{16 + 64, 96 + 64},
+	{46 + 64, 249+ 64},
+	{133+ 64, 378+ 64},
+	{262+ 64, 465+ 64},
+	{416+ 64, 496+ 64},
+	{569+ 64, 465+ 64},
+	{698+ 64, 378+ 64},
+	{785+ 64, 249+ 64},
+	{816+ 64, 96 + 64}
+};
+
+// Will be calculated later
+POINT physical_touch_pos[9] = {
+	{0,0},
+	{0,0},
+	{0,0},
+	{0,0},
+	{0,0},
+	{0,0},
+	{0,0},
+	{0,0},
+	{0,0}
+};
+
+void logical_to_physical(const POINT* logical, POINT* physical)
+{
+	CKLBDrawResource& dr = CKLBDrawResource::getInstance();
+
+	int x, y = 0;
+
+	dr.toPhisicalPosition(logical->x, logical->y, x, y);
+
+	physical->x = x;
+	physical->y = y;
+}
 
 //
 //-----------------------------------------
@@ -107,10 +148,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	static int  rot         = 0;
 	static int  mouse_stat  = 0;
 	static int  lastX, lastY;
-	static char commandBuff[1000];
-	static int  commandLen      = 0;
-	static int  g_bRender       = 0;
-	static bool g_bRenderChange = true;
 
 	switch (message)
     {
@@ -118,8 +155,14 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			return 0;
 		
 		case WM_CLOSE:
-			PostQuitMessage( 0 );
-			return 0;
+			{
+				if(SIF_Win32::CloseWindowAsBack == false)
+					PostQuitMessage( 0 );
+				else
+					CPFInterface::getInstance().client().inputDeviceKey(IClientRequest::KEY_BACK, IClientRequest::KEYEVENT_CLICK);
+				
+				break;
+			}
 		
 		case WM_COMMAND:
 			{
@@ -165,72 +208,47 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		case WM_KEYDOWN:
 			switch (wParam) {
 			case VK_ESCAPE:
-				PostQuitMessage(0);
-				return 0;
-			case VK_RETURN:
-				if (commandLen != 0) {
-					CPFInterface::getInstance().client().executeCommand(commandBuff);
-					printf("\n");
-					commandLen = 0;
-					memset(commandBuff, 0, 1000);
-				}
-				break;
-			case VK_LEFT:
-				break;
-			case VK_RIGHT:
-				break;
-			case VK_UP:
-				break;
-			case VK_DOWN:
-				break;
-			case VK_F9:
-				if (g_bRenderChange) {
-					g_bRender++;
-					switch (g_bRender % 3) {
-					case 0:			CPFInterface::getInstance().client().executeCommand("RENDER NORMAL"); break;
-					case 1:			CPFInterface::getInstance().client().executeCommand("RENDER OVERDRAW"); break;
-					case 2:			CPFInterface::getInstance().client().executeCommand("RENDER BATCH"); break;
-					}
-				}
-				break;
-			case VK_F2:
-				{
-					static bool gPlay = true;
-					gPlay = !gPlay;
-					if (gPlay) {
-						CPFInterface::getInstance().client().executeCommand("PLAY");
-					} else {
-						CPFInterface::getInstance().client().executeCommand("STOP");
-					}
-				}
-				break;
-			case VK_F3:
-				{
-					CPFInterface::getInstance().client().executeCommand("UNLOAD");
-				}
-				break;
-			case VK_F4:
-				{
-					CPFInterface::getInstance().client().executeCommand("RELOAD");
-				}
+				if(SIF_Win32::CloseWindowAsBack == false)
+					PostQuitMessage(0);
+
 				break;
 			case VK_BACK:
 				{
-					CPFInterface::getInstance().client().inputDeviceKey(IClientRequest::KEY_BACK, IClientRequest::KEYEVENT_CLICK);
-					break;
+					if(SIF_Win32::CloseWindowAsBack == false)
+						CPFInterface::getInstance().client().inputDeviceKey(IClientRequest::KEY_BACK, IClientRequest::KEYEVENT_CLICK);
 				}
+				break;
 			default:
-				if (wParam >=32 && wParam <= 127) {
-					commandBuff[commandLen++] = wParam;
-					printf("\r%s",commandBuff);
-				} else {
-					if (wParam == 8) {
-						commandBuff[--commandLen] = 0;
-						printf("\r%s                                                            ",commandBuff);
+				if(SIF_Win32::AllowKeyboard)
+				{
+					for(int i = 0; i < 9; i++)
+					{
+						IClientRequest* cr = &CPFInterface::getInstance().client();
+						if(wParam == SIF_Win32::VirtualKeyIdol[i])
+						{
+							POINT& physical = physical_touch_pos[i];
+							cr->inputPoint(54 + i, IClientRequest::I_CLICK, physical.x, physical.y);
+						}
+					}
+				}
+				break;
+			}
+			break;
+		case WM_KEYUP:
+			{
+				if(SIF_Win32::AllowKeyboard)
+				{
+					for(int i = 0; i < 9; i++)
+					{
+						IClientRequest* cr = &CPFInterface::getInstance().client();
+						if(wParam == SIF_Win32::VirtualKeyIdol[i])
+						{
+							POINT& physical = physical_touch_pos[i];
+							cr->inputPoint(54 + i, IClientRequest::I_RELEASE, physical.x, physical.y);
+						}
 					}
 				}
 			}
-
 			break;
         case WM_DESTROY:
             PostQuitMessage(0);                                             
@@ -246,7 +264,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				{
 					TouchPoint& cur = *i;
 					
-					DEBUG_PRINT("TouchID = %d; X = %d; Y = %d; Type = %d", cur.TouchID, cur.X, cur.Y, int(cur.Type));
+					//DEBUG_PRINT("TouchID = %d; X = %d; Y = %d; Type = %d", cur.TouchID, cur.X, cur.Y, int(cur.Type));
 
 					switch(cur.Type)
 					{
@@ -457,10 +475,14 @@ int GameEngineMain(int argc, _TCHAR* argv[])
 					}
 					else if(strcmp("multicore", argv[parse+1]) == 0)
 					{
-						SetProcessAffinityMask(GetCurrentProcess(), 0x1);
+						SIF_Win32_IS_SINGLECORE = true;
+						OVERRIDE_IS_SINGECORE = true;
 					}
 					else if(strcmp("release", argv[parse+1]) == 0)
+					{
 						SIF_Win32_IS_RELEASE = false;
+						OVERRIDE_IS_RELEASE = true;
+					}
 				}
 
 				parse += 2;
@@ -487,6 +509,7 @@ int GameEngineMain(int argc, _TCHAR* argv[])
 	int scrW	= temp.right - temp.left;
 	int scrH	= temp.bottom - temp.top;
 
+	// Create external folder
 	CreateDirectoryA(g_pathExtern, NULL);
 
 	CWin32PathConv& pathconv = CWin32PathConv::getInstance();
@@ -529,9 +552,6 @@ int GameEngineMain(int argc, _TCHAR* argv[])
 	OleInitialize(NULL);
 	EnableWindow(hwnd, TRUE);
 
-	// Register touch window
-	Win32Touch::RegisterWindowForTouch(hwnd);
-
 	CPFInterface& pfif = CPFInterface::getInstance();
 	CWin32Platform * pPlatform = new CWin32Platform(hwnd);
 
@@ -546,6 +566,16 @@ int GameEngineMain(int argc, _TCHAR* argv[])
 	pfif.client().setInitParam((hasDefaultDB   ? IClientRequest::ENGINE_USE_DEFAULTDB   : 0)
 							|  (hasDefaultFont ? IClientRequest::ENGINE_USE_DEFAULTFONT : 0), NULL); 
 
+	// Set info
+	if(OVERRIDE_IS_RELEASE == false)
+		SIF_Win32_IS_RELEASE = SIF_Win32::DebugMode == false;
+	if(OVERRIDE_IS_SINGECORE == false)
+		SIF_Win32_IS_SINGLECORE = SIF_Win32::SingleCore;
+
+	// Check if single core mode is used.
+	if(SIF_Win32_IS_SINGLECORE)
+		SetProcessAffinityMask(GetCurrentProcess(), 0x1);
+
 	// sound initialize
 	SoundSystemInitFor_Win32();
 	CWin32AudioMgr::getInstance().init(hwnd);
@@ -557,10 +587,6 @@ int GameEngineMain(int argc, _TCHAR* argv[])
 	glClearColor(1.0f, 0.7f, 0.2039f, 0.0f);
 	glDisable( GL_CULL_FACE );
 
-	//
-
-	// testCodeInit();
-
 	// set screen size
 	if(is_maximized)
 	{
@@ -571,6 +597,7 @@ int GameEngineMain(int argc, _TCHAR* argv[])
 		HEIGHT = client_area.bottom;
 	}
 	pfif.client().setScreenInfo(false, WIDTH, HEIGHT);
+
 	// boot path
 	if (strlen(g_fileName)) {
 		pfif.client().setFilePath(g_fileName);
@@ -581,6 +608,10 @@ int GameEngineMain(int argc, _TCHAR* argv[])
 		klb_assertAlways("Could not initialize game, most likely memory error");
 	} else {
 		static DWORD lastTime = GetTickCount();
+
+		// Calculate touch position
+		for(int i = 0; i < 9; i++)
+			logical_to_physical(&logical_touch_pos[i], &physical_touch_pos[i]);
 
 		// Main message loop:
 		bool quit = false;
@@ -625,11 +656,7 @@ int GameEngineMain(int argc, _TCHAR* argv[])
 						// Rendering complete.
 						//		
 						//testCodeLoop(delta);
-						if (pClient.frameFlip(fixedDelta ? fixedDelta : delta) == false)
-						{
-							// Exit game
-							quit = true;
-						}
+						quit = !pClient.frameFlip(fixedDelta ? fixedDelta : delta);
 
 						// pfIF.platform().flipFrame();
 						SwapBuffers( hDC );
@@ -639,7 +666,7 @@ int GameEngineMain(int argc, _TCHAR* argv[])
 					CWin32Widget::ReDrawControls();
 				}
 			}
-			//Sleep(1);
+			Sleep(1); // To cool down the processor
 		}
 	}
 

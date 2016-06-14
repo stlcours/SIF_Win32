@@ -14,9 +14,43 @@
    limitations under the License.
 */
 #include <stdafx.h>
+#include <Windows.h>
 #include "GameEngine.h"
+#include "SIF_Win32.h"
 
-int _tmain(int argc, _TCHAR * argv[])
+namespace SIF_Win32
 {
+	bool AllowKeyboard = true;
+	char VirtualKeyIdol[9] = {
+		52,		// 4
+		82,		// R
+		70,		// F
+		86,		// V
+		66,		// B
+		78,		// N
+		74,		// J
+		73,		// I
+		57,		// 9
+	};
+	bool AllowTouchscreen = true;
+	bool DebugMode = false;
+	bool SingleCore = false;
+	bool CloseWindowAsBack = false;
+}
+
+int main(int argc, char* argv[])
+{
+	if(argc > 1)
+	{
+		if(strcmpi(argv[1], "-config") == 0)
+		{
+			MessageBoxA(NULL, "TODO: Show config window", "Unimplemented", MB_OK | MB_ICONEXCLAMATION);
+			return 0;
+		}
+	}
+
+	// Read configuration file before start
+
+
 	return GameEngineMain(argc, argv);
 }

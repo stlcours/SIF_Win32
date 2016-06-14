@@ -17,7 +17,6 @@
 #define CWin32Widget_h
 
 #include <Windows.h>
-#include <ExDisp.h>
 #include "OSWidget.h"
 
 class CWin32Platform;
@@ -130,10 +129,6 @@ public:
 
 private:
 	// void redraw();
-	IWebBrowser2* m_WebBrowser;
-	void register_windowclass();
-	bool set_header(VARIANT* variant, const char* token, const char* region,
-		const char* client, const char* consumerKey, const char* appID, const char* userID);
 };
 
 class CWin32MovieWidget : public CWin32Widget

@@ -390,13 +390,19 @@ CWin32WebWidget::CWin32WebWidget(CWin32Platform * pParent) : CWin32Widget(pParen
 CWin32WebWidget::~CWin32WebWidget() {}
 
 bool
-CWin32WebWidget::create(IWidget::CONTROL type, int id, const char * url,
+CWin32WebWidget::create(IWidget::CONTROL type, int id, const char * /*caption*/,
 							int x, int y, int width, int height,
-							const char * token, const char * region, const char * client,
-							const char * consumerKey, const char * applicationId, const char * userID)
+							const char * /*token*/, const char * /*region*/, const char * /*client*/,
+							const char * /*consumerKey*/, const char * /*applicationId*/, const char * /*userID*/)
 {
 
 	HWND hWnd = 0;
+	void (*AtlAxWinInit)();
+	HRESULT (*AtlAxGetControl)(HWND,IUnknown **);
+	HMODULE hAtl = LoadLibrary("atl");
+	AtlAxWinInit = (void (*)())GetProcAddress(hAtl ,"AtlAxWinInit");
+	AtlAxGetControl = (HRESULT (*)(HWND, IUnknown **))GetProcAddress(hAtl, "AtlAxGetControl");
+	AtlAxWinInit();
 
 	switch(type)
 	{
@@ -406,73 +412,21 @@ CWin32WebWidget::create(IWidget::CONTROL type, int id, const char * url,
 	case WEBVIEW:
 	case WEBNOJUMP:
 		{
-			register_windowclass();
-
-			hWnd = CreateWindowExA(0, "SIF_Win32WebView", "SIF_Win32WebView",
-								WS_CHILD|WS_VISIBLE|WS_POPUP, x, y, width, height, 
+			hWnd = 0;
+			/*
+			CreateWindow("AtlAxWin", "Shell.Explorer.2",
+								WS_CHILD|WS_VISIBLE, x, y, width, height, 
 								getPlatform().get_hWnd(),
 								(HMENU)0, (HINSTANCE)GetModuleHandle(NULL), NULL);
-			if(hWnd == NULL)
-				return false;
-
-			klb_assert(
-				CoCreateInstance(CLSID_InternetExplorer, NULL, CLSCTX_LOCAL_SERVER, IID_IWebBrowser2, (void**)&m_WebBrowser) == S_OK
-				&& m_WebBrowser != NULL,
-				"Cannot create IWebBrowser2 interface"
-			);
-
-			VARIANT empty_variant;
-			VARIANT window_target_variant;
-			VARIANT headers;
-			BSTR url_target;
-			BSTR window_target = SysAllocString(L"SIF_Win32WebView");
-			size_t new_url_size = (strlen(url) + 1) * 2;
-			wchar_t* new_url = new wchar_t[new_url_size];
-
-			VariantInit(&empty_variant);
-			VariantInit(&window_target_variant);
-			VariantInit(&headers);
-			mbstowcs(new_url, url, new_url_size);
-			set_header(&headers, token, region, client, consumerKey, applicationId, userID);
-
-			url_target = SysAllocString(new_url);
-			window_target_variant.vt = VT_BSTR;
-			window_target_variant.bstrVal = window_target;
-			delete[] new_url;
-
-			if(m_WebBrowser->Navigate(url_target, &empty_variant, &window_target_variant, &empty_variant, &headers) == S_OK)
-				m_WebBrowser->put_Visible(VARIANT_TRUE);
-
-			if(IsDebuggerPresent()) DebugBreak();
+//			IUnknown * hUnknown;
+//			if(AtlAxGetControl(hWnd, &hUnknown) == S_OK) {
+				
+//			}
+			*/
 		}
 		break;
 	}
 	return init(hWnd, id, x, y, width, height);
-}
-
-void CWin32WebWidget::register_windowclass()
-{
-	static bool already_here = false;
-
-	if(already_here == false)
-	{
-		already_here = true;
-
-		WNDCLASSA wc;
-		HINSTANCE hInst = GetModuleHandleA(NULL);
-		wc.style = 0;
-		wc.lpfnWndProc = DefWindowProcA;
-		wc.cbClsExtra = 0;
-		wc.cbWndExtra = 0;
-		wc.hInstance = hInst;
-		wc.hIcon = LoadIcon(NULL, IDI_APPLICATION);
-		wc.hCursor = LoadCursor(NULL, IDC_ARROW);
-		wc.hbrBackground = (HBRUSH)GetStockObject(WHITE_BRUSH);
-		wc.lpszMenuName = NULL;
-		wc.lpszClassName = "SIF_Win32WebView";
-
-		klb_assert(RegisterClassA(&wc), "Cannot create SIF_Win32WebView window class");
-	}
 }
 
 
