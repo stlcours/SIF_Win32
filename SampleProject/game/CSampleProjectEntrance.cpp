@@ -42,7 +42,7 @@ bool ReadConfiguration()
 	{
 		readconfig_fail:
 
-		fclose(fp);
+		if(fp) fclose(fp);
 		delete[] data;
 		delete node;
 		
@@ -66,8 +66,9 @@ bool ReadConfiguration()
 	
 	if(node == NULL) goto readconfig_fail;
 
-	for(CKLBJsonItem* child = node->child(); child->next() != NULL; child = child->next())
+	for(CKLBJsonItem* child = node->child();; child = child->next())
 	{
+		if(child == NULL) break;
 		// Check for boolean values first
 		{
 			auto list = &BooleanValList[0];	// Visual Studio 2010 supports "auto" keyword ;)

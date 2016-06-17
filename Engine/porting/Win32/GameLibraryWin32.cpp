@@ -292,6 +292,15 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				ReleaseTouchHandle((void*)lParam);
 			}
 			break;
+		case WM_SYSCOMMAND:
+			{
+				IClientRequest& cr = CPFInterface::getInstance().client();
+
+				if(wParam == SC_MINIMIZE)
+					cr.pauseGame(true);
+				else if(wParam == SC_RESTORE)
+					cr.pauseGame(false);
+			}
         default:                                                            
             return DefWindowProc(hWnd, message, wParam, lParam);            
     }                                                                   
