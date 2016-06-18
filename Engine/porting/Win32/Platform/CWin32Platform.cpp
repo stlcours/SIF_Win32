@@ -131,11 +131,10 @@ CWin32Platform::getPlatform()
 }
 
 u32 CWin32Platform::getPhysicalMemKB() {
-	unsigned long long x = 0xFFFFFFFFULL;
+	MEMORYSTATUSEX memstat = {sizeof(MEMORYSTATUSEX)};
+	klb_assert(GlobalMemoryStatusEx(&memstat), "GlobalMemoryStatusEx() failed");
 
-	klb_assert(GetPhysicallyInstalledSystemMemory(&x) == 1, "GetPhysicallyInstalledSystemMemory() failed");
-
-	return x / 1024;
+	return memstat.ullAvailPhys / 1024;
 }
 
 void
