@@ -21,7 +21,6 @@
 #include <dsound.h>
 #include "lame.h"
 #include "encryptFile.h"
-#pragma comment(lib, "libmp3lame.lib")
 
 
 class CWin32MP3
