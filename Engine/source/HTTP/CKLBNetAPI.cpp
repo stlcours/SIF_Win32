@@ -274,17 +274,30 @@ void CKLBNetAPI::login(int phase, int status_code)
 		{
 			// Login OK
 			char user_id[16];
-			kc.setToken(m_pRoot->child()->child()->getString());	// Authorize token
+			
+			if((status_code = m_pRoot->child()->next()->getInt()) == 200)
+			{
+				kc.setToken(m_pRoot->child()->child()->getString());	// Authorize token
 		
-			sprintf(user_id, "%d", m_pRoot->child()->child()->next()->getInt());
-			kc.setUserID(user_id);	// User ID
+				sprintf(user_id, "%d", m_pRoot->child()->child()->next()->getInt());
+				kc.setUserID(user_id);	// User ID
 		
-			NetworkManager::releaseConnection(m_http);	// Release it first before calling lua callback.
-			m_http = NULL;
-			m_request_type = (-1);
-			m_netapi_phase = 0;
+				NetworkManager::releaseConnection(m_http);	// Release it first before calling lua callback.
+				m_http = NULL;
+				m_request_type = (-1);
+				m_netapi_phase = 0;
 
-			lua_callback(NETAPIMSG_LOGIN_SUCCESS, status_code, m_pRoot, 1);
+				lua_callback(NETAPIMSG_LOGIN_SUCCESS, status_code, m_pRoot, 1);
+			}
+			else
+			{
+				NetworkManager::releaseConnection(m_http);	// Release it first before calling lua callback.
+				m_http = NULL;
+				m_request_type = (-1);
+				m_netapi_phase = 0;
+
+				lua_callback(NETAPIMSG_LOGIN_FAILED, status_code, m_pRoot, 1);
+			}
 
 			return;
 		}
@@ -363,8 +376,12 @@ CKLBNetAPI::execute(u32 deltaT)
 		
 		if(invalid == false)
 		{
-			if(state == 200 || state == 600) m_pRoot = getJsonTree((const char*)body, bodyLen);
+			if(bodyLen > 0) m_pRoot = getJsonTree((const char*)body, bodyLen);
 			m_nonce++;	// Increase nonce if request success.
+
+			puts("!====Response Data====!");
+			fwrite(body, 1, bodyLen, stdout);
+			puts("\n*====Response Data====*");
 
 			if(m_request_type == NETAPI_STARTUP)
 				return startUp(m_netapi_phase, state);

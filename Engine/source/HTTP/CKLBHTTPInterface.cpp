@@ -132,7 +132,11 @@ void CKLBHTTPInterface::download() {
 					size_t content_len = strlen(&ptr[1]);
 					*ptr = 0;
 
-					DEBUG_PRINT("Form : %s = %s\n",formItem,&ptr[1]);
+					// DEBUG_PRINT("Form : %s = %s\n",formItem,&ptr[1]);
+					fputs("Form : ", stdout);
+					fputs(formItem, stdout);
+					fputs(" = ", stdout);
+					puts(&ptr[1]);
 
 					curl_formadd(
 						&formpost,

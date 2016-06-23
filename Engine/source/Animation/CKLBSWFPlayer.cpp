@@ -265,7 +265,7 @@ bool CKLBSWFAsset::LoadData(u8* pData) {
 	pData += offset;
 
 	this->m_msPerFrame			= READU16P(pData);
-	this->m_msPerFrame = 16;	// Always 60FPS
+	m_msPerFrame = 24;
 
 	//
 	// Create String Constant Pool.

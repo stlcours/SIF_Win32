@@ -478,6 +478,17 @@ int GameEngineMain(int argc, _TCHAR* argv[])
 				if (strcmp("-maximize", argv[parse]) == 0)
 					is_maximized = argv[parse+1][0] == '1';
 
+#ifndef _DEBUG
+				if (strcmp("-log", argv[parse]) == 0)
+				{
+					if(argv[parse+1][0] == '1')
+					{
+						freopen("stdout.txt", "w", stdout);
+						freopen("stderr.txt", "w", stderr); 
+					}
+				}
+#endif
+
 				if (strcmp("-no", argv[parse]) == 0) {
 					if (strcmp("defaultfont", argv[parse+1]) == 0) {
 						hasDefaultFont = false;
@@ -652,33 +663,29 @@ int GameEngineMain(int argc, _TCHAR* argv[])
 				// is only added to make the triangle rotate at a basically constant
 				// rate, independent of the target (Win32) platform
 				DWORD newTime   = GetTickCount();
-				DWORD delta     = newTime - lastTime;
+				int delta     = newTime - lastTime;
 
-				// Handle rollover
-				if (newTime < lastTime) {
-					delta = 0;
-				} else {
-					if (delta > (DWORD)frameTime) {
-						sendEvents();
-
-						lastTime = newTime;
-						//dglClear(GL_COLOR_BUFFER_BIT);
+				sendEvents();
+				//dglClear(GL_COLOR_BUFFER_BIT);
 	
-						//
-						// Rendering complete.
-						//		
-						//testCodeLoop(delta);
-						quit = !pClient.frameFlip(fixedDelta ? fixedDelta : delta);
+				//
+				// Rendering complete.
+				//		
+				//testCodeLoop(delta);
+				quit = !pClient.frameFlip(fixedDelta ? fixedDelta : delta);
 
-						// pfIF.platform().flipFrame();
-						SwapBuffers( hDC );
-					}
-                    // コントロール(ex. TextBox)が作られている場合、その再描画を行う
-					// If a Control (ex TextBox) is done, redraw them.
-					CWin32Widget::ReDrawControls();
-				}
+				// pfIF.platform().flipFrame();
+				SwapBuffers( hDC );
+                // コントロール(ex. TextBox)が作られている場合、その再描画を行う
+				// If a Control (ex TextBox) is done, redraw them.
+				CWin32Widget::ReDrawControls();
+
+				delta = frameTime - (GetTickCount() - newTime);
+				//if(delta > 0)
+					Sleep(1);
+
+				lastTime = newTime;
 			}
-			Sleep(1); // To cool down the processor
 		}
 	}
 

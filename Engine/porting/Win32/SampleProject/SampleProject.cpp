@@ -49,8 +49,5 @@ int main(int argc, char* argv[])
 		}
 	}
 
-	// Read configuration file before start
-
-
 	return GameEngineMain(argc, argv);
 }
