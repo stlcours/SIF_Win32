@@ -24,6 +24,9 @@
 #include <ctype.h>
 
 ;
+
+static int fail_times = 0;
+
 enum {
 	// Command Values
 	NETAPI_STARTUP,				// start new account
@@ -407,12 +410,21 @@ CKLBNetAPI::execute(u32 deltaT)
 					}
 				}
 			}
+			fail_times = 0;
+
+			NetworkManager::releaseConnection(m_http);
+			m_http = NULL;
+			m_request_type = (-1);
+			lua_callback(msg, state, m_pRoot, m_nonce - 1);
+
+			return;
 		}
+
 		NetworkManager::releaseConnection(m_http);
 		m_http = NULL;
 		m_request_type = (-1);
 
-		lua_callback(msg, state, m_pRoot, m_nonce - 1);
+		lua_callback(msg, state, m_pRoot, m_nonce);
 
 		return;
 	}
@@ -420,6 +432,11 @@ CKLBNetAPI::execute(u32 deltaT)
 	
 
 	if ((m_http->m_threadStop == 1) && (m_http->getHttpState() == -1)) {
+		if(fail_times < 5)
+		{
+			fail_times++;
+			goto netapi_timeout;
+		}
 		lua_callback(map_netapi_fail(m_request_type), -1, NULL, m_nonce);
 		NetworkManager::releaseConnection(m_http);
 		m_http = NULL;
@@ -427,6 +444,7 @@ CKLBNetAPI::execute(u32 deltaT)
 
 	// Time out third (after check that valid has arrived)
 	if (m_timestart >= m_timeout) {
+		netapi_timeout:
 		lua_callback(NETAPIMSG_SERVER_TIMEOUT, -1, NULL, m_nonce);
 		NetworkManager::releaseConnection(m_http);
 		m_http = NULL;
@@ -503,6 +521,8 @@ CKLBNetAPI::initScript(CLuaState& lua)
 
 	if(lua.isString(8))
 		m_verup_callback = CKLBUtility::copyString(lua.getString(8));
+
+	fail_times = 0;
 
 	return init(NULL, lua.getString(5));
 }
