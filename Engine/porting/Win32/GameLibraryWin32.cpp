@@ -61,6 +61,9 @@ bool OVERRIDE_IS_RELEASE = false;
 bool SIF_Win32_IS_SINGLECORE = false;
 bool OVERRIDE_IS_SINGECORE = false;
 
+HICON create_icon_32x32();
+HICON create_icon_16x16();
+
 POINT logical_touch_pos[9] = {
 	{16 + 64, 96 + 64},
 	{46 + 64, 249+ 64},
@@ -535,7 +538,7 @@ int GameEngineMain(int argc, _TCHAR* argv[])
 	CWin32PathConv& pathconv = CWin32PathConv::getInstance();
 	pathconv.setPath(g_pathInstall, g_pathExtern);
 
-	WNDCLASS wc;
+	WNDCLASSEXA wc = {sizeof(WNDCLASSEXA)};
 	HWND hwnd;
 	HDC hDC;
 	HGLRC hRC;
@@ -547,12 +550,13 @@ int GameEngineMain(int argc, _TCHAR* argv[])
 	wc.cbClsExtra = 0;
 	wc.cbWndExtra = 0;
 	wc.hInstance = hInstance;
-	wc.hIcon = LoadIcon( NULL, IDI_APPLICATION );
+	wc.hIcon = create_icon_32x32();
 	wc.hCursor = LoadCursor( NULL, IDC_ARROW );
 	wc.hbrBackground = (HBRUSH)GetStockObject( BLACK_BRUSH );
 	wc.lpszMenuName = NULL;
 	wc.lpszClassName = "GameEngineGL";
-	RegisterClass( &wc );
+	wc.hIconSm = create_icon_16x16();
+	RegisterClassExA(&wc);
 	
 	// create main window
 	hwnd = CreateWindowExA(0,

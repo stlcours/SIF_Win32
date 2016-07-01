@@ -25,5 +25,8 @@
     <ClCompile Include="SampleProject.cpp">
       <Filter>source</Filter>
     </ClCompile>
+    <ClCompile Include="..\Icon.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

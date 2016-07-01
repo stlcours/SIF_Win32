@@ -115,6 +115,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\SampleProject\game\CSampleProjectEntrance.cpp" />
+    <ClCompile Include="..\Icon.cpp" />
     <ClCompile Include="SampleProject.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
