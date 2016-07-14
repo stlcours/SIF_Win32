@@ -21,7 +21,7 @@
 namespace SIF_Win32
 {
 	bool AllowKeyboard = true;
-	char VirtualKeyIdol[9] = {
+	unsigned char VirtualKeyIdol[9] = {
 		52,		// 4
 		82,		// R
 		70,		// F

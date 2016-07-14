@@ -103,7 +103,7 @@ int map_netapi_fail(int request_type)
 		case NETAPI_SEND:
 			return NETAPIMSG_REQUEST_FAILED;
 		default:
-			return NETAPIMSG_CONNECTION_FAILED;
+			return NETAPIMSG_SERVER_ERROR;
 	}
 }
 
@@ -376,10 +376,21 @@ CKLBNetAPI::execute(u32 deltaT)
 		// Support only JSon for callback
 		// 
 		freeJSonResult();
+
+		if(bodyLen > 0) m_pRoot = getJsonTree((const char*)body, bodyLen);
+
+		/* Upps, server sends invalid JSON */
+		if(m_pRoot == NULL)
+		{
+			NetworkManager::releaseConnection(m_http);
+			m_http = NULL;
+			lua_callback(NETAPIMSG_SERVER_ERROR, state, NULL, m_nonce);
+
+			return;
+		}
 		
 		if(invalid == false)
 		{
-			if(bodyLen > 0) m_pRoot = getJsonTree((const char*)body, bodyLen);
 			m_nonce++;	// Increase nonce if request success.
 
 			puts("!====Response Data====!");
