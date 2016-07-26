@@ -47,7 +47,11 @@
 	// Set the "Close" (or "X") button in Window as SIF back button. False by default.
 	// By default, back button is mapped to "Backspace" button and pressing "Close" window button immediately closes SIF.
 	// Setting this to true make it map the back button to "Close" window button and unmap the "Backspace" key.
-	"CloseWindowAsBack": false
+	"CloseWindowAsBack": false,
+	
+	// Enable Android Mode to allow account transfers between Android and SIF-Win32 with loveca
+	// Disable Android Mode to allow account transfers between iOS and SIF-Win32 with loveca
+	"AndroidMode": false
 	
 	// End of configuration file.
 }

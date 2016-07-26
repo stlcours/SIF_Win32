@@ -19,7 +19,7 @@
 #include "CKLBJsonItem.h"
 #include "CPFInterface.h"
 #include "CKLBNetAPIKeyChain.h"
-
+#include "SIF_Win32.h"
 #include <time.h>
 #include <ctype.h>
 
@@ -629,9 +629,15 @@ void CKLBNetAPI::set_header(CKLBHTTPInterface* http, const char* authorize_strin
 	headers[3] = bundle_version;
 	headers[4] = client_version;
 	headers[5] = "Debug: 1";
-	headers[6] = "OS: Win32";
-	headers[7] = os_version;
-	headers[8] = "Platform-Type: 3";
+	if (SIF_Win32::AndroidMode){
+		headers[6] = "OS: Android";
+		headers[7] = "OS-Version: GT-N7100 samsung smdk4x12 4.4.2";
+		headers[8] = "Platform-Type: 2";
+	}else{
+		headers[6] = "OS: Win32";
+		headers[7] = os_version;
+		headers[8] = "Platform-Type: 3";
+	}
 	headers[9] = region;
 	headers[10] = time_zone;
 	headers[11] = user_id;

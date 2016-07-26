@@ -36,6 +36,7 @@ namespace SIF_Win32
 	bool DebugMode = false;
 	bool SingleCore = false;
 	bool CloseWindowAsBack = false;
+	bool AndroidMode = false;
 }
 
 int main(int argc, char* argv[])

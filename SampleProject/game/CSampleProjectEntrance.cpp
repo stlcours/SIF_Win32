@@ -28,6 +28,7 @@ const struct
 	{"DebugMode", &SIF_Win32::DebugMode},
 	{"SingleCore", &SIF_Win32::SingleCore},
 	{"CloseWindowAsBack", &SIF_Win32::CloseWindowAsBack},
+	{"AndroidMode", &SIF_Win32::AndroidMode},
 	{NULL, NULL}
 };
 
