@@ -8,4 +8,5 @@ namespace SIF_Win32
 	extern bool DebugMode;
 	extern bool SingleCore;
 	extern bool CloseWindowAsBack;
+	extern bool AndroidMode;
 }
