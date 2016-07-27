@@ -49,8 +49,9 @@
 	// Setting this to true make it map the back button to "Close" window button and unmap the "Backspace" key.
 	"CloseWindowAsBack": false,
 	
-	// Enable Android Mode to allow account transfers between Android and SIF-Win32 with loveca
-	// Disable Android Mode to allow account transfers between iOS and SIF-Win32 with loveca
+	// Enable Android Mode to allow account transfers between Android and SIF-Win32 with loveca.
+	// Disable Android Mode to allow account transfers between iOS and SIF-Win32 with loveca.
+	// It does not change how SIF-Win32 berhaves. It just affect used account.
 	"AndroidMode": false
 	
 	// End of configuration file.

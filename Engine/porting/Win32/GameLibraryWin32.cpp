@@ -89,6 +89,9 @@ POINT physical_touch_pos[9] = {
 	{0,0}
 };
 
+// Possibility to fix the keyboard input issue
+bool Keyboard_Is_pressed[9] = {0, 0, 0, 0, 0, 0, 0, 0, 0};
+
 void logical_to_physical(const POINT* logical, POINT* physical)
 {
 	CKLBDrawResource& dr = CKLBDrawResource::getInstance();
@@ -142,7 +145,6 @@ void DisableOpenGL(HWND hWnd, HDC hDC, HGLRC hRC)
 	wglDeleteContext( hRC );
 	ReleaseDC( hWnd, hDC );
 }
-
 
 const char* gsrc = NULL;
 
@@ -227,9 +229,11 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 					for(int i = 0; i < 9; i++)
 					{
 						IClientRequest* cr = &CPFInterface::getInstance().client();
-						if(wParam == SIF_Win32::VirtualKeyIdol[i])
+						if(wParam == SIF_Win32::VirtualKeyIdol[i] && !Keyboard_Is_pressed[i])
 						{
 							POINT& physical = physical_touch_pos[i];
+
+							Keyboard_Is_pressed[i] = true;
 							cr->inputPoint(54 + i, IClientRequest::I_CLICK, physical.x, physical.y);
 						}
 					}
@@ -247,6 +251,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 						if(wParam == SIF_Win32::VirtualKeyIdol[i])
 						{
 							POINT& physical = physical_touch_pos[i];
+
+							Keyboard_Is_pressed[i] = false;
 							cr->inputPoint(54 + i, IClientRequest::I_RELEASE, physical.x, physical.y);
 						}
 					}
