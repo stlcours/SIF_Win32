@@ -33,6 +33,9 @@
 #include "RenderingFramework.h"
 #include <Windows.h>
 #include <gl/GL.h>
+#include <openssl/conf.h>
+#include <openssl/evp.h>
+#include <openssl/err.h>
 #include "CPFInterface.h"
 #include "CWin32Platform.h"
 #include "CWin32PathConv.h"
@@ -110,6 +113,27 @@ void logical_to_physical(const POINT* logical, POINT* physical)
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 void EnableOpenGL (HWND hWnd, HDC * hDC, HGLRC * hRC);
 void DisableOpenGL(HWND hWnd, HDC hDC, HGLRC hRC);
+
+static long long int counterStart;
+static double pCFreq;
+
+void initHiResTimer()
+{
+	LARGE_INTEGER temp;
+
+	QueryPerformanceFrequency(&temp);
+	pCFreq = double(temp.QuadPart) / 1000;
+
+	QueryPerformanceCounter(&temp);
+	counterStart = temp.QuadPart;
+}
+
+double getHiResTimer()
+{
+	LARGE_INTEGER temp;
+	QueryPerformanceCounter(&temp);
+	return double(temp.QuadPart - counterStart) / pCFreq;
+}
 
 // Enable OpenGL
 void EnableOpenGL(HWND hWnd, HDC * hDC, HGLRC * hRC)
@@ -419,6 +443,11 @@ int GameEngineMain(int argc, _TCHAR* argv[])
 	bool is_maximized = false;
 	klb_assert(bStdModuleExist, "The links of a system are insufficient.");
 
+	ERR_load_crypto_strings();
+	OPENSSL_add_all_algorithms_noconf();
+
+	initHiResTimer();
+
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_RGB | GLUT_DEPTH);
 	glutCreateWindow("GLEW Test");
@@ -640,7 +669,7 @@ int GameEngineMain(int argc, _TCHAR* argv[])
 	if (!pfif.client().initGame()) {
 		klb_assertAlways("Could not initialize game, most likely memory error");
 	} else {
-		static DWORD lastTime = GetTickCount();
+		static double lastTime = getHiResTimer();
 
 		// Calculate touch position
 		for(int i = 0; i < 9; i++)
@@ -655,7 +684,8 @@ int GameEngineMain(int argc, _TCHAR* argv[])
 		{
 			/* relay message queue messages to windowproc's */
 			MSG msg;
-			while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
+
+			while(PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
 			{
 				TranslateMessage(&msg);
 
@@ -672,27 +702,20 @@ int GameEngineMain(int argc, _TCHAR* argv[])
 				// This is not the safest or best way to handle timing, but this code
 				// is only added to make the triangle rotate at a basically constant
 				// rate, independent of the target (Win32) platform
-				DWORD newTime   = GetTickCount();
-				int delta     = newTime - lastTime;
+				double newTime   = getHiResTimer();
+				double delta     = newTime - lastTime;
 
 				sendEvents();
-				//dglClear(GL_COLOR_BUFFER_BIT);
-	
-				//
-				// Rendering complete.
-				//		
-				//testCodeLoop(delta);
 				quit = !pClient.frameFlip(fixedDelta ? fixedDelta : delta);
-
-				// pfIF.platform().flipFrame();
 				SwapBuffers( hDC );
-                // コントロール(ex. TextBox)が作られている場合、その再描画を行う
+				// コントロール(ex. TextBox)が作られている場合、その再描画を行う
 				// If a Control (ex TextBox) is done, redraw them.
 				CWin32Widget::ReDrawControls();
 
-				delta = frameTime - (GetTickCount() - newTime);
-				//if(delta > 0)
-					Sleep(1);
+				int sleep_time = newTime + 16.667 - getHiResTimer();
+				
+				if(sleep_time > 0)
+					Sleep(sleep_time);
 
 				lastTime = newTime;
 			}

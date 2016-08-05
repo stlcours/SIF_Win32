@@ -38,6 +38,8 @@ private:
 	static s32	luaDelExternal		(lua_State * L);
 	static s32	luaGetExternalFree	(lua_State * L);
 	static s32	luaGetFileList		(lua_State * L);
+	static s32	luaRegisterNotFound	(lua_State * L);
+	static s32	luaSetPlaceHolder	(lua_State * L);
 };
 
 

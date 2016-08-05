@@ -1918,5 +1918,14 @@
     <ClCompile Include="Platform\Win32TouchLib.cpp">
       <Filter>Platform</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\LuaLib\CryptoFunc.cpp">
+      <Filter>Source Files\LuaLib\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Core\md5.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Core\honokamiku_decrypter.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

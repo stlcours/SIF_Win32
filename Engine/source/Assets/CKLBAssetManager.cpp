@@ -18,6 +18,7 @@
 #include "Dictionnary.h"
 #include "CPFInterface.h"
 #include "CKLBUtility.h"
+#include "CKLBLuaEnv.h"
 
 // --------------------------------------------------------------
 //   Asset Manager
@@ -34,6 +35,8 @@ CKLBAssetManager::CKLBAssetManager()
 , m_currentLoadingFile	(NULL)
 , m_maxAssetEntry   	(0)
 , m_unloaded			(false)
+, placeholder_path		(NULL)
+, notfound_handler		(NULL)
 {
 	memset32(m_arrayByCharCode, NULL, 256*sizeof(IKLBAssetPlugin*));
 //	init();	// 2012.12.11  Reboot時に通らない為、外で明示的に呼びます
@@ -347,6 +350,10 @@ CKLBAssetManager::loadAssetByFileName(const char* fileName, IKLBAssetPlugin* plu
 				m_currentLoadingFile = NULL;
 				delete pStream;
 				if(!bResult || !pAsset) {
+					CKLBLuaEnv& x = CKLBLuaEnv::getInstance();
+
+					x.call_assetNotFound(notfound_handler, fileName);
+
 					return NULL;
 				}
 				return pAsset;
@@ -395,7 +402,7 @@ CKLBAssetManager::loadAssetStream(IReadStream* pReadStream, CKLBAbstractAsset** 
 			}
 		}
 	} else {
-		klb_assertAlways("File not found or invalid stream");
+		return false;
 	}
 
 	logEndTime('A',(*ppAsset ? (*ppAsset)->getName() : NULL));
@@ -520,6 +527,20 @@ CKLBAssetManager::freeAsset(u16 assetID)
 		CKLBAbstractAsset* pAsset = this->freeAssetSlot(assetID);
 		KLBDELETE(pAsset);	// Also free memory slot if any or reference count.
 	}
+}
+
+bool CKLBAssetManager::setAssetNotFound(const char* hand)
+{
+	KLBDELETEA(notfound_handler);
+	notfound_handler = CKLBUtility::copyString(hand);
+
+	return true;
+}
+
+bool CKLBAssetManager::setPlaceHolder(const char* asset)
+{
+	// TODO
+	return true;
 }
 
 // =========================================================================

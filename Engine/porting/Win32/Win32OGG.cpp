@@ -27,7 +27,7 @@ int Win32OGG_Seek(void *fh, ogg_int64_t to, int type)
 {
 	Win32OGG_DecoderS* decoder = (Win32OGG_DecoderS*)fh;
 	CDecryptBaseClass* dctx = decoder->dctx;
-	int header_size = dctx->m_useNew ? 4 : 0;
+	int header_size = dctx->m_header_size;
 	int pos = 0;
 	int retval;
 	
@@ -46,7 +46,7 @@ long Win32OGG_Tell(void* fh)
 {
 	Win32OGG_DecoderS* decoder = (Win32OGG_DecoderS*)fh;
 
-	return ftell(decoder->fp) - (decoder->dctx->m_useNew ? 4 : 0);
+	return ftell(decoder->fp) - decoder->dctx->m_header_size;
 }
 
 ov_callbacks Win32OGG_Callbacks = {&Win32OGG_Read, &Win32OGG_Seek, NULL, &Win32OGG_Tell};
@@ -67,11 +67,10 @@ bool SoundAnalysis_OGG(const char* path, sSoundAnalysisData* analysis_data)
 	// Setup decrypter and variables
 	if(CPFInterface::getInstance().platform().useEncryption())
 	{
-		u8 hdr[4];
-		fread(hdr, 1, 4, fp);
-
-		if(decrypter.decryptSetup((const u8*)path, hdr) == 0)
-			fseek(fp, 0, SEEK_SET);
+		u8 hdr[16];
+		fread(hdr, 1, 16, fp);
+		decrypter.decryptSetup((const u8*)path, hdr);
+		fseek(fp, decrypter.m_header_size, SEEK_SET);
 	}
 
 	decoder.fp = fp;
@@ -114,11 +113,11 @@ bool CWin32MP3::loadOGG(const char* name)
 	// Setup decrypter and variables
 	if(CWin32Platform::g_useDecryption)
 	{
-		u8 hdr[4];
-		fread(hdr, 1, 4, fp);
+		u8 hdr[16];
+		fread(hdr, 1, 16, fp);
 
-		if(m_decrypter.decryptSetup((const u8*)name, hdr) == 0)
-			fseek(fp, 0, SEEK_SET);
+		m_decrypter.decryptSetup((const u8*)name, hdr);
+		fseek(fp, m_decrypter.m_header_size, SEEK_SET);
 	}
 
 	decoder.fp = fp;

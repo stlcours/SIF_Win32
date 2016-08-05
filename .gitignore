@@ -44,6 +44,8 @@ project.xcworkspace/
 /Engine/porting/Win32/SampleProject/Release/
 /Engine/porting/Win32/ipch/
 
+/Engine/porting/Linux
+
 # object files things
 *.exe
 *.pdb

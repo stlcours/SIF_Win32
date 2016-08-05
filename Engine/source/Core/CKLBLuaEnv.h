@@ -49,6 +49,8 @@ public:
 	bool intoMaintenance	();
 	bool exitMaintenance	();
 
+	void call_assetNotFound	(const char* funcname, const char* handler);
+
     void errMsg				(const char * str);
     
     static int load			(lua_State * L);

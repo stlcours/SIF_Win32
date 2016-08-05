@@ -19,15 +19,20 @@
 #include "BaseType.h"
 #include "encryptUserContext.h"
 
+extern "C" {
+#include "honokamiku_decrypter.h"
+}
+
 /*!
     @class  DecryptBaseClass
     @brief  複合化基礎クラス
  */
 class CDecryptBaseClass {
 public:
-	SUserStruct	m_userCtx;
+	honokamiku_context m_dctx;
 	bool		m_decrypt;
 	bool		m_useNew;
+	int			m_header_size;
 private:
 	void		decrypt(void* ptr, u32 length);
 public:

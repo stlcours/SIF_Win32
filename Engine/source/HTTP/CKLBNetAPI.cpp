@@ -342,7 +342,7 @@ CKLBNetAPI::execute(u32 deltaT)
 
 	// Check cancel first
 	if (m_canceled) {
-		lua_callback(NETAPIMSG_CONNECTION_CANCELED, -1, NULL, m_nonce - 1);
+		lua_callback(NETAPIMSG_CONNECTION_CANCELED, -1, NULL, m_nonce);
 
 		NetworkManager::releaseConnection(m_http);
 		m_http = NULL;
@@ -741,10 +741,15 @@ CKLBNetAPI::commandScript(CLuaState& lua)
 			else {
 				char api[MAX_PATH];
 				const char* end_point = "/api";
+				const char* url_target = NULL;
 
 				if(lua.isString(4))
-					end_point = lua.getString(4);
-				sprintf(api, "%s%s", kc.getURL(), end_point);
+					end_point = url_target = lua.getString(4);
+
+				if(url_target != NULL && strstr(url_target, "http://") == url_target)
+					memcpy(api, url_target, strlen(url_target));
+				else
+					sprintf(api, "%s%s", kc.getURL(), end_point);
 
 				// Header list
 				const char** headers = NULL;

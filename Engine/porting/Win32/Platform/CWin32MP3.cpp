@@ -126,16 +126,10 @@ CWin32MP3::loadMP3(const char * name)
 	if(!rfp) return false;
 	
 	if (CWin32Platform::g_useDecryption) {
-		u8 hdr[4];
-		hdr[0] = 0;
-		hdr[1] = 0;
-		hdr[2] = 0;
-		hdr[3] = 0;
-		fread(hdr,1,4,rfp);
+		u8 hdr[16];
+		fread(hdr,1,6,rfp);
 		u32 hasHeader = decryptSetup((const u8*)name, hdr);
-		if (hasHeader == 0) {
-			fseek(rfp, 0, SEEK_SET);
-		}
+		fseek(rfp, hasHeader, SEEK_SET);
 	}
 
 	size_t nSize, nPos;

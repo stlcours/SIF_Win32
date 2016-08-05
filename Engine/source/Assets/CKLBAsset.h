@@ -356,6 +356,12 @@ public:
 	bool		loadAsset			(u8* stream, u32 streamSize, CKLBAbstractAsset** ppAsset, IKLBAssetPlugin* plugIn = NULL, bool useAsync = false);
 
 	bool		init				(u32 maxAssetEntry, u32 dicoNodeMax);	// 2012.12.11  Reboot時に明示皁E��呼ぶ為に外へ出しました
+
+	/* SIF v4 fix */
+	const char* placeholder_path;
+	const char* notfound_handler;
+	bool		setAssetNotFound	(const char* handler);
+	bool		setPlaceHolder		(const char* asset);
 private:
 
 	// OPTIMIZE RP : can optimize with this union between : pAsset vs prev/next

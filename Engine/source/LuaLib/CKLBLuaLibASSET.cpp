@@ -38,6 +38,8 @@ CKLBLuaLibASSET::addLibrary()
 	addFunction("ASSET_delExternal",		CKLBLuaLibASSET::luaDelExternal);
 	addFunction("ASSET_getExternalFree",	CKLBLuaLibASSET::luaGetExternalFree);
 	addFunction("ASSET_getFileList",		CKLBLuaLibASSET::luaGetFileList);
+	addFunction("ASSET_registerNotFound",	CKLBLuaLibASSET::luaRegisterNotFound);
+	addFunction("ASSET_setPlaceHolder",		CKLBLuaLibASSET::luaSetPlaceHolder);
 }
 
 s32
@@ -199,6 +201,19 @@ s32 CKLBLuaLibASSET::luaGetFileList(lua_State* L)
 
 	delete[] path;
 	return 1;
+}
+
+s32 CKLBLuaLibASSET::luaRegisterNotFound(lua_State* L)
+{
+	CKLBAssetManager::getInstance().setAssetNotFound(luaL_checklstring(L, 1, NULL));
+
+	return 0;
+}
+
+s32 CKLBLuaLibASSET::luaSetPlaceHolder(lua_State* L)
+{
+	// TODO
+	return 0;
 }
 
 void CKLBLuaLibASSET::cmdGetImageSize(const char* asset_name, s32* pReturnWidth, s32* pReturnHeight)

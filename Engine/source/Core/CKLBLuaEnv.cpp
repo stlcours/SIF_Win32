@@ -57,6 +57,22 @@ int eventNoticing(lua_State* L)
 	return 0;
 }
 
+/* SIF v4 fix */
+int addExtMsg(lua_State* L)
+{
+	CLuaState(L).print_stack();
+
+	return 0;
+}
+
+/* SIF v4 fix */
+int getGhostPlayerActivity(lua_State* L)
+{
+	lua_pushboolean(L, 0);
+
+	return 1;
+}
+
 int traceback (lua_State *L) {
   const char *msg = lua_tostring(L, 1);
   if (msg)
@@ -192,6 +208,10 @@ CKLBLuaEnv::setupLuaEnv()
 	lua_setglobal(m_L, "PfGame_Service");
 	lua_pushcfunction(m_L, &eventNoticing);
 	lua_setglobal(m_L, "eventNoticing");
+	lua_pushcfunction(m_L, &addExtMsg);
+	lua_setglobal(m_L, "addExtMsg");
+	lua_pushcfunction(m_L, &getGhostPlayerActivity);
+	lua_setglobal(m_L, "getGhostPlayerActivity");
     
 	// 全てに先駆けて、NULL を定義する
 	lua_pushlightuserdata(m_L, 0);
@@ -916,4 +936,15 @@ void
 CKLBLuaEnv::cmdExit()
 { 
 	CKLBTaskMgr::getInstance().setExit(); 
+}
+
+void CKLBLuaEnv::call_assetNotFound(const char* a, const char* b)
+{
+	lua_State* L = m_L;
+
+	klb_assert(luaL_loadstring(L, "local arg={...}arg[1](arg[2],arg[2])") == 0, "loadstring error");
+	lua_pushstring(L, a);
+	lua_pushstring(L, b);
+
+	klb_assert(lua_pcall(L, 2, 0, 0) == 0, "script error");
 }

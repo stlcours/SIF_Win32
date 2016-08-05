@@ -861,17 +861,13 @@ CWin32AudioMgr::loadWAV(CWin32Audio& audio, SNDINFO * info)
 	// Decryption
 	u32 hasHeader = 0;
 	if (CWin32Platform::g_useDecryption) {
-		u8 hdr[4];
-		hdr[0] = 0;
-		hdr[1] = 0;
-		hdr[2] = 0;
-		hdr[3] = 0;
-		fread(hdr,1,4,pFile);
+		u8 hdr[16];
+		fread(hdr,1,16,pFile);
 		hasHeader = decryptSetup((const u8*)soundpath, hdr);
 	}
 
 	fseek	(pFile, 0, SEEK_END);
-    dwBufferLength=ftell (pFile) - (hasHeader * 4);
+    dwBufferLength=ftell (pFile) - hasHeader;
 	if (!dwBufferLength) {
 		goto exit;
 	} else {
@@ -880,7 +876,7 @@ CWin32AudioMgr::loadWAV(CWin32Audio& audio, SNDINFO * info)
 			goto exit;
 		}
 	}
-	fseek	(pFile, hasHeader * 4, SEEK_SET);
+	fseek	(pFile, hasHeader, SEEK_SET);
 	fread	(lpBuffer, 1, dwBufferLength, pFile);
 
 	decrypt(lpBuffer, dwBufferLength);

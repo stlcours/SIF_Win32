@@ -230,7 +230,9 @@ private:
     }
 
 	inline u32 decryptSetup(const u8* ptr, const u8* hdr) {
-        return m_decrypter.decryptSetup(ptr,hdr);
+        m_decrypter.decryptSetup(ptr,hdr);
+
+		return m_decrypter.m_header_size;
     }
 };
 
