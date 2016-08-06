@@ -543,6 +543,9 @@ int GameEngineMain(int argc, _TCHAR* argv[])
 					}
 				}
 
+				if(strcmp("-chika", argv[parse]) == 0)
+					SIF_Win32::ChikaIcon = argv[parse+1][0] == '1';
+
 				parse += 2;
 			} else {
 				// Specify the boot file

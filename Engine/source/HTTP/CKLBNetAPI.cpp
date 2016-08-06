@@ -733,21 +733,21 @@ CKLBNetAPI::commandScript(CLuaState& lua)
 			// 4. End point URL. Defaults to "/api" if is nil
 			// 5. Timeout
 			// 6. Skip version check?
+			// 7. Absolute URL
 			//
 			CKLBNetAPIKeyChain& kc = CKLBNetAPIKeyChain::getInstance();
-			if(argc < 3 || argc > 6) {
+			if(argc < 3 || argc > 7) {
 				lua.retBoolean(false);
 			}
 			else {
 				char api[MAX_PATH];
 				const char* end_point = "/api";
-				const char* url_target = NULL;
 
 				if(lua.isString(4))
-					end_point = url_target = lua.getString(4);
+					end_point = lua.getString(4);
 
-				if(url_target != NULL && strstr(url_target, "http://") == url_target)
-					memcpy(api, url_target, strlen(url_target));
+				if(lua.isBool(7) && lua.getBool(7))
+					memcpy(api, end_point, strlen(end_point) + 1);
 				else
 					sprintf(api, "%s%s", kc.getURL(), end_point);
 
