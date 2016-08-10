@@ -29,6 +29,7 @@ const struct
 	{"SingleCore", &SIF_Win32::SingleCore},
 	{"CloseWindowAsBack", &SIF_Win32::CloseWindowAsBack},
 	{"AndroidMode", &SIF_Win32::AndroidMode},
+	{"KeepRunningOnError", &SIF_Win32::KeepRunningOnError},
 	{NULL, NULL}
 };
 

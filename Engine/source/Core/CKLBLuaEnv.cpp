@@ -34,9 +34,10 @@
 #endif
 
 #endif
+#include <openssl/sha.h>
 ;
 
-// Dirty hack to fix the PfGameService nil error
+// SIF v2.3.x fix
 int PfGameService(lua_State* L)
 {
 	DEBUG_PRINT("PfGame_Service called");
@@ -45,16 +46,15 @@ int PfGameService(lua_State* L)
 	return 1;
 }
 
-// Dirty hack to fix the eventNoticing nil error
+// eventNoticing is nil fix
 int eventNoticing(lua_State* L)
 {
-	if(lua_isstring(L, 1))
-	{
-		lua_pushboolean(L, 1);
-		return 1;
-	}
-	klb_assertAlways("Arg 1 is not string");
-	return 0;
+	CLuaState lua(L);
+
+	(void)lua.getString(1);
+	lua.retBool(1);
+
+	return 1;
 }
 
 /* SIF v4 fix */
@@ -69,6 +69,29 @@ int addExtMsg(lua_State* L)
 int getGhostPlayerActivity(lua_State* L)
 {
 	lua_pushboolean(L, 0);
+
+	return 1;
+}
+
+/* Scorematch fix */
+int HASH_SHA1(lua_State* L)
+{
+	size_t len;
+	const char* str = luaL_checklstring(L, 1, &len);
+	unsigned char hash[SHA_DIGEST_LENGTH];
+
+	SHA1((const u8*)str, len, hash);
+
+	char out[61];
+
+#ifdef _MSC_VER
+	auto snprintf = sprintf_s;
+#endif
+
+	for (int i = 0; i < 20; i++)
+		snprintf(out+i*2, 4, "%02x", hash[i]);
+
+	lua_pushstring(L, out);
 
 	return 1;
 }

@@ -10,4 +10,5 @@ namespace SIF_Win32
 	extern bool CloseWindowAsBack;
 	extern bool AndroidMode;
 	extern bool ChikaIcon;
+	extern bool KeepRunningOnError;
 }

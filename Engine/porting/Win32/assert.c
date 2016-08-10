@@ -13,6 +13,7 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 */
+#include "SIF_Win32.h"
 #include "assert_klb.h"
 #include "CWin32Platform.h"
 #include <Windows.h>
@@ -32,8 +33,12 @@ void assertFunction(int line, const char* file, const char* msg,...) {
 	sprintf_s( log,1024, "Assert l.%i in %s : \n%s\n",line, file, pszBuf); 
 
 	MessageBox(hWnd , log, "Assert", MB_OK | MB_ICONEXCLAMATION);
-	if(IsDebuggerPresent()) DebugBreak();
-	else exit(1);
+
+	if(SIF_Win32::KeepRunningOnError == false)
+		if(IsDebuggerPresent())
+			DebugBreak();
+		else
+			exit(1);
 }
 
 void msgBox(char* log) {

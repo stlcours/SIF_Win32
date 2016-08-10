@@ -64,6 +64,8 @@ bool OVERRIDE_IS_RELEASE = false;
 bool SIF_Win32_IS_SINGLECORE = false;
 bool OVERRIDE_IS_SINGECORE = false;
 
+bool frame_limit = true;
+
 HICON create_icon_32x32();
 HICON create_icon_16x16();
 
@@ -267,6 +269,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			break;
 		case WM_KEYUP:
 			{
+				if(wParam == VK_F12)
+				{
+					frame_limit = !frame_limit;
+					DEBUG_PRINT("Frame limiter = %d", int(frame_limit));
+				}
+
 				if(SIF_Win32::AllowKeyboard)
 				{
 					for(int i = 0; i < 9; i++)
@@ -715,10 +723,13 @@ int GameEngineMain(int argc, _TCHAR* argv[])
 				// If a Control (ex TextBox) is done, redraw them.
 				CWin32Widget::ReDrawControls();
 
-				int sleep_time = newTime + 16.667 - getHiResTimer();
+				if(frame_limit)
+				{
+					int sleep_time = newTime + 16.667 - getHiResTimer();
 				
-				if(sleep_time > 0)
-					Sleep(sleep_time);
+					if(sleep_time > 0)
+						Sleep(sleep_time);
+				}
 
 				lastTime = newTime;
 			}

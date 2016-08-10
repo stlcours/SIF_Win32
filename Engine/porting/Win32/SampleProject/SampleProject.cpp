@@ -38,6 +38,7 @@ namespace SIF_Win32
 	bool CloseWindowAsBack = false;
 	bool AndroidMode = false;
 	bool ChikaIcon = false;
+	bool KeepRunningOnError = false;
 }
 
 int main(int argc, char* argv[])

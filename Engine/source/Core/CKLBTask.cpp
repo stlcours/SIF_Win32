@@ -463,7 +463,7 @@ bool
 CKLBTaskMgr::execute(u32 deltaT)
 {
 	IPlatformRequest& pf = CPFInterface::getInstance().platform();
-	pf.mutexLock(task_mutex);
+	//pf.mutexLock(task_mutex);
     // すべてのタスクを呼び出す前に、削除リストを初期化する。
     m_lstRemove.begin = m_lstRemove.end = NULL;
     
@@ -495,10 +495,11 @@ CKLBTaskMgr::execute(u32 deltaT)
 #else
         scriptTime = 0;
 #endif
+		int task_processed_count = 0;
 
-        for(pTask = m_lstTask[i].begin; pTask; pTask = pTask->m_pExeNext) {
+        for(pTask = m_lstTask[i].begin; pTask && task_processed_count < 1024; pTask = pTask->m_pExeNext) {
             m_currentTask = pTask;
-			// taskCount++;
+			task_processed_count++;
 
             // 開始時刻の取得
 #ifdef DEBUG_PERFORMANCE
@@ -551,7 +552,7 @@ CKLBTaskMgr::execute(u32 deltaT)
 #endif
 
 	m_currentTask = NULL;
-	pf.mutexUnlock(task_mutex);
+	//pf.mutexUnlock(task_mutex);
     return m_bExit;
 }
 
