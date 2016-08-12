@@ -15,6 +15,12 @@
 */
 #include <stdafx.h>
 #include <Windows.h>
+
+#include <openssl/sha.h>
+#include <openssl/conf.h>
+#include <openssl/evp.h>
+#include <openssl/err.h>
+
 #include "GameEngine.h"
 #include "SIF_Win32.h"
 
@@ -41,8 +47,59 @@ namespace SIF_Win32
 	bool KeepRunningOnError = false;
 }
 
+static HANDLE lock;
+
+bool OneInstanceCheck()
+{
+	char hashed_path[MAX_PATH];
+	char exedir[MAX_PATH];
+	char hash[SHA256_DIGEST_LENGTH * 2 + 1];
+
+	GetModuleFileNameA(NULL, exedir, MAX_PATH);
+
+	{
+		char* last_occured = NULL;
+
+		for(char* x = exedir; *x != 0; x++)
+			if(*x == '\\')
+				last_occured = x;
+
+		if(last_occured)
+			*last_occured = 0;
+
+		unsigned char temp_hash[SHA256_DIGEST_LENGTH];
+		char* target_hash = hash;
+
+		SHA256((unsigned char*)exedir, strlen(exedir), temp_hash);
+
+		for(int i = 0; i < SHA256_DIGEST_LENGTH; i++)
+		{
+			sprintf(target_hash, "%02x", int(temp_hash[i]));
+			target_hash += 2;
+		}
+	}
+
+	sprintf(hashed_path, "Global\\SIF-Win32__%s", hash);
+
+	lock = CreateMutexA(NULL, 0, hashed_path);
+
+	if(GetLastError() == ERROR_ALREADY_EXISTS)
+	{
+		CloseHandle(lock);
+		return false;
+	}
+
+	return true;
+}
+
 int main(int argc, char* argv[])
 {
+	if(!OneInstanceCheck())
+	{
+		MessageBoxA(NULL, "Only one instance of the application is allowed", "SIF-Win32", MB_OK | MB_ICONEXCLAMATION);
+		return 1;
+	}
+
 	if(argc > 1)
 	{
 		if(strcmpi(argv[1], "-config") == 0)
@@ -52,5 +109,11 @@ int main(int argc, char* argv[])
 		}
 	}
 
-	return GameEngineMain(argc, argv);
+	ERR_load_crypto_strings();
+	OPENSSL_add_all_algorithms_noconf();
+
+	int ret = GameEngineMain(argc, argv);
+
+	CloseHandle(lock);
+	return ret;
 }

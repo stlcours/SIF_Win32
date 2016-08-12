@@ -18,11 +18,13 @@
 #include "CKLBJsonItem.h"
 #include "SIF_Win32.h"
 
-const struct
+struct KeyValue_Info
 {
 	const char* name;
 	bool* value;
-} BooleanValList[] = {
+};
+
+KeyValue_Info BooleanValList[] = {
 	{"AllowKeyboard", &SIF_Win32::AllowKeyboard},
 	{"AllowTouchscreen", &SIF_Win32::AllowTouchscreen},
 	{"DebugMode", &SIF_Win32::DebugMode},
@@ -73,7 +75,7 @@ bool ReadConfiguration()
 		if(child == NULL) break;
 		// Check for boolean values first
 		{
-			auto list = &BooleanValList[0];	// Visual Studio 2010 supports "auto" keyword ;)
+			KeyValue_Info* list = &BooleanValList[0];
 
 			for(;;list++)
 			{

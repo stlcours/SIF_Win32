@@ -33,9 +33,6 @@
 #include "RenderingFramework.h"
 #include <Windows.h>
 #include <gl/GL.h>
-#include <openssl/conf.h>
-#include <openssl/evp.h>
-#include <openssl/err.h>
 #include "CPFInterface.h"
 #include "CWin32Platform.h"
 #include "CWin32PathConv.h"
@@ -65,6 +62,7 @@ bool SIF_Win32_IS_SINGLECORE = false;
 bool OVERRIDE_IS_SINGECORE = false;
 
 bool frame_limit = true;
+double frame_limit_time_ms = 16.67;
 
 HICON create_icon_32x32();
 HICON create_icon_16x16();
@@ -451,9 +449,6 @@ int GameEngineMain(int argc, _TCHAR* argv[])
 	bool is_maximized = false;
 	klb_assert(bStdModuleExist, "The links of a system are insufficient.");
 
-	ERR_load_crypto_strings();
-	OPENSSL_add_all_algorithms_noconf();
-
 	initHiResTimer();
 
 	glutInit(&argc, argv);
@@ -617,6 +612,15 @@ int GameEngineMain(int argc, _TCHAR* argv[])
 	// enable OpenGL for the window
 	EnableOpenGL( hwnd, &hDC, &hRC );
 
+	// Get screen refresh rate
+	{
+		DEVMODEA temp;
+
+		if(EnumDisplaySettingsA(NULL, ENUM_CURRENT_SETTINGS, &temp))
+			if(temp.dmDisplayFrequency > 1)
+				frame_limit_time_ms = 1000.0 / double(temp.dmDisplayFrequency);
+	}
+
 	// COM Initialization
 	CoInitialize(NULL);
 	OleInitialize(NULL);
@@ -725,7 +729,7 @@ int GameEngineMain(int argc, _TCHAR* argv[])
 
 				if(frame_limit)
 				{
-					int sleep_time = newTime + 16.667 - getHiResTimer();
+					int sleep_time = newTime + frame_limit_time_ms - getHiResTimer();
 				
 					if(sleep_time > 0)
 						Sleep(sleep_time);

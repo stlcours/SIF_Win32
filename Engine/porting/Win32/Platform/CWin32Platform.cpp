@@ -837,9 +837,16 @@ CWin32Platform::watchThread(void * hThread, s32 * status)
 void
 CWin32Platform::deleteThread(void * hThread)
 {
-	PF_THREAD * pThread = (PF_THREAD *)hThread;
-	CloseHandle( pThread->hWin32Thread );
-	delete pThread;
+	__try
+	{
+		PF_THREAD * pThread = (PF_THREAD *)hThread;
+		CloseHandle( pThread->hWin32Thread );
+		delete pThread;
+	}
+	__except(EXCEPTION_EXECUTE_HANDLER)
+	{
+		DEBUG_PRINT("WARNING: m_thread is invalid!");
+	}
 }
 
 // スレッドを強制中断する
