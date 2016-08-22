@@ -54,7 +54,14 @@ CUnZip::Open(const char * zip_path)
 	m_bReady = false;
 	m_hUnzip = unzOpen(zip_path);
 	if (!m_hUnzip){
-		return false;
+		for(int x = 0; x < 3 && m_hUnzip == NULL; x++)
+		{
+			m_hUnzip = unzOpen(zip_path);
+			Sleep(20);
+		}
+
+		if(!m_hUnzip)
+			return false;
 	}
 	unzGetGlobalInfo(m_hUnzip, &m_globalInfo);
 	m_bReady = true;

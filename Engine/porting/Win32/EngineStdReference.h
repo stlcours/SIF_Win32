@@ -20,7 +20,7 @@
 
 template<class T>
 inline bool getFactoryFunc() {
-	return (0 != CKLBTaskFactory<T>::createFactory);
+	return (CKLBTaskFactory<T>::createFactory != NULL);
 }
 
 template<class T>

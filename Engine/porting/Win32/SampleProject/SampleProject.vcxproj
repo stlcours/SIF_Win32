@@ -88,6 +88,8 @@
       <AdditionalIncludeDirectories>../../../source/UISystem/;../../../source/Animation/;../../../source/Assets/;../../../source/Core/;../../../source/LuaLib/;../../../source/HTTP/;../../../source/SystemTask/;../../../source/Rendering/;../../../source/SceneGraph/;../../../source/UnitSystem/;../../../include/;../../../Source/include/;../../../libs/minizip;../../../libs/lua;../../../porting/Win32/;../../../porting/Win32/LuaEdit/include/;../../../porting/Win32/Platform;../../../porting/Win32/openssl/include/;../../../porting/Win32/zlib/include/;../../../porting/Win32/Lame/;../../../libs/SQLite/;../../../source/Database/;../../../source/AISystem/;../../../source/DataSet/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
+      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>

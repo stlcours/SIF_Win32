@@ -73,6 +73,8 @@ int getGhostPlayerActivity(lua_State* L)
 	return 1;
 }
 
+typedef int(*snprintf_t)(char* , size_t , const char * , ...);
+
 /* Scorematch fix */
 int HASH_SHA1(lua_State* L)
 {
@@ -85,7 +87,7 @@ int HASH_SHA1(lua_State* L)
 	char out[61];
 
 #ifdef _MSC_VER
-	auto snprintf = sprintf_s;
+	snprintf_t snprintf = &sprintf_s;
 #endif
 
 	for (int i = 0; i < 20; i++)

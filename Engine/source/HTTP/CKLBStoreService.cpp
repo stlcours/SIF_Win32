@@ -63,6 +63,7 @@ CKLBStoreService::CKLBStoreService()
 : CKLBLuaTask	()
 , m_callback	(NULL)
 {
+	(void)factory;
 }
 
 CKLBStoreService::~CKLBStoreService() 

@@ -65,6 +65,9 @@
 #include "CKLBAsyncLoader.h"
 #include "CKLBAsyncFilecopy.h"
 
+#ifdef __clang__
+[[clang::optnone]]
+#endif
 bool EngineTaskReference()
 {
 	bool bResult = true;

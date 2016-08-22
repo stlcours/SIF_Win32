@@ -119,6 +119,24 @@ char* create_authorize_string(const char* consumerKey, int nonce, const char* to
 	return out;
 }
 
+int get_statuscode(CKLBJsonItem* response)
+{
+	int status_code = 0;
+
+	while(status_code == 0 && response != NULL)
+	{
+		if(strcmp(response->key(), "status_code") == 0)
+		{
+			status_code = response->getInt();
+			break;
+		}
+
+		response = response->next();
+	}
+
+	return status_code;
+}
+
 CKLBNetAPI::CKLBNetAPI()
 : CKLBLuaTask           ()
 , m_http				(NULL)
@@ -277,8 +295,10 @@ void CKLBNetAPI::login(int phase, int status_code)
 		{
 			// Login OK
 			char user_id[16];
-			
-			if((status_code = m_pRoot->child()->next()->getInt()) == 200)
+
+			// Find status code
+
+			if((status_code = get_statuscode(m_pRoot->child())) == 200)
 			{
 				kc.setToken(m_pRoot->child()->child()->getString());	// Authorize token
 		
@@ -515,6 +535,8 @@ CKLBNetAPI::init(	CKLBTask* pTask,
 	return res;
 }
 
+extern char* server_url_force;
+
 bool
 CKLBNetAPI::initScript(CLuaState& lua)
 {
@@ -524,7 +546,12 @@ CKLBNetAPI::initScript(CLuaState& lua)
     if (argc < 7) { return false; }
 
 	CKLBNetAPIKeyChain& kc = CKLBNetAPIKeyChain::getInstance();
-	kc.setURL(lua.getString(1));
+
+	if(server_url_force)
+		kc.setURL(server_url_force);
+	else
+		kc.setURL(lua.getString(1));
+
 	kc.setConsumernKey(lua.getString(2));
 	kc.setClient(lua.getString(3));
 	kc.setAppID(lua.getString(4));

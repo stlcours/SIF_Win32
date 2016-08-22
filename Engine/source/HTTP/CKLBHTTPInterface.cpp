@@ -54,6 +54,7 @@ s32 CKLBHTTPInterface::HTTPConnectionThread(void * /*hThread*/, void * data)
 
 char xms_key[XMESSAGECODE_LEN];
 bool xms_aleady_processed = false;
+extern char* XMC_Force;
 
 #ifdef _M_IX86
 void process_xms()
@@ -154,8 +155,16 @@ void CKLBHTTPInterface::download() {
 						char temp[41];
 						char xmc[64];
 
-						process_xms();
-						hash = HMAC(EVP_sha1(), xms_key, XMESSAGECODE_LEN, reinterpret_cast<const u8*>(ptr + 1), content_len, NULL, NULL);
+						if(XMC_Force == NULL)
+						{
+							process_xms();
+							hash = HMAC(EVP_sha1(), xms_key, XMESSAGECODE_LEN, reinterpret_cast<const u8*>(ptr + 1), content_len, NULL, NULL);
+						}
+						else
+						{
+							static size_t xmc_force_len = strlen(XMC_Force);
+							hash = HMAC(EVP_sha1(), XMC_Force, xmc_force_len, reinterpret_cast<const u8*>(ptr + 1), content_len, NULL, NULL);
+						}
 
 						for(int i = 0; i < 20; i++)
 						{

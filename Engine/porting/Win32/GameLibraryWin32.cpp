@@ -33,6 +33,7 @@
 #include "RenderingFramework.h"
 #include <Windows.h>
 #include <gl/GL.h>
+#include <wglew.h>
 #include "CPFInterface.h"
 #include "CWin32Platform.h"
 #include "CWin32PathConv.h"
@@ -60,6 +61,8 @@ bool SIF_Win32_IS_RELEASE = true;
 bool OVERRIDE_IS_RELEASE = false;
 bool SIF_Win32_IS_SINGLECORE = false;
 bool OVERRIDE_IS_SINGECORE = false;
+char* XMC_Force = NULL;
+char* server_url_force = NULL;
 
 bool frame_limit = true;
 double frame_limit_time_ms = 16.67;
@@ -519,6 +522,12 @@ int GameEngineMain(int argc, _TCHAR* argv[])
 				if (strcmp("-maximize", argv[parse]) == 0)
 					is_maximized = argv[parse+1][0] == '1';
 
+				if(strcmp("-xmc", argv[parse]) == 0)
+					XMC_Force = argv[parse + 1];
+
+				if(strcmp("-server", argv[parse]) == 0)
+					server_url_force = argv[parse + 1];
+
 #ifndef _DEBUG
 				if (strcmp("-log", argv[parse]) == 0)
 				{
@@ -684,7 +693,7 @@ int GameEngineMain(int argc, _TCHAR* argv[])
 	if (!pfif.client().initGame()) {
 		klb_assertAlways("Could not initialize game, most likely memory error");
 	} else {
-		static double lastTime = getHiResTimer();
+		static double lastTime = GetTickCount();
 
 		// Calculate touch position
 		for(int i = 0; i < 9; i++)
@@ -694,6 +703,9 @@ int GameEngineMain(int argc, _TCHAR* argv[])
 		bool quit = false;
 		s32 frameTime = pfif.client().getFrameTime();
 		IClientRequest& pClient = pfif.client();
+
+		/*if(wglSwapIntervalEXT)
+			wglSwapIntervalEXT(1);*/
 
 		while (!quit)
 		{
@@ -717,7 +729,7 @@ int GameEngineMain(int argc, _TCHAR* argv[])
 				// This is not the safest or best way to handle timing, but this code
 				// is only added to make the triangle rotate at a basically constant
 				// rate, independent of the target (Win32) platform
-				double newTime   = getHiResTimer();
+				double newTime   = GetTickCount();
 				double delta     = newTime - lastTime;
 
 				sendEvents();
@@ -729,10 +741,10 @@ int GameEngineMain(int argc, _TCHAR* argv[])
 
 				if(frame_limit)
 				{
-					int sleep_time = newTime + frame_limit_time_ms - getHiResTimer();
-				
-					if(sleep_time > 0)
-						Sleep(sleep_time);
+					delta = frameTime - (GetTickCount() - newTime);
+
+					if(delta >= 0)
+						Sleep(3);
 				}
 
 				lastTime = newTime;
