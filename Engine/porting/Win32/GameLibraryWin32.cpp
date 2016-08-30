@@ -272,8 +272,14 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			{
 				if(wParam == VK_F12)
 				{
-					frame_limit = !frame_limit;
-					DEBUG_PRINT("Frame limiter = %d", int(frame_limit));
+					if(wglSwapIntervalEXT)
+					{
+						frame_limit = !frame_limit;
+						DEBUG_PRINT("Frame limiter = %d", int(frame_limit));
+						wglSwapIntervalEXT(int(frame_limit));
+					}
+					else
+						DEBUG_PRINT("Warning: Frame limiter is not supported!");
 				}
 
 				if(SIF_Win32::AllowKeyboard)
@@ -305,8 +311,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				for(TouchInputList::iterator i = touchlist.begin(); i != touchlist.end(); i++)
 				{
 					TouchPoint& cur = *i;
-					
-					//DEBUG_PRINT("TouchID = %d; X = %d; Y = %d; Type = %d", cur.TouchID, cur.X, cur.Y, int(cur.Type));
 
 					switch(cur.Type)
 					{
@@ -704,8 +708,10 @@ int GameEngineMain(int argc, _TCHAR* argv[])
 		s32 frameTime = pfif.client().getFrameTime();
 		IClientRequest& pClient = pfif.client();
 
-		/*if(wglSwapIntervalEXT)
-			wglSwapIntervalEXT(1);*/
+		if(wglSwapIntervalEXT)
+			wglSwapIntervalEXT(1);
+		else
+			DEBUG_PRINT("Warning: Frame limiter is not supported!");
 
 		while (!quit)
 		{
@@ -739,13 +745,13 @@ int GameEngineMain(int argc, _TCHAR* argv[])
 				// If a Control (ex TextBox) is done, redraw them.
 				CWin32Widget::ReDrawControls();
 
-				if(frame_limit)
+				/*if(frame_limit)
 				{
 					delta = frameTime - (GetTickCount() - newTime);
 
 					if(delta >= 0)
 						Sleep(3);
-				}
+				}*/
 
 				lastTime = newTime;
 			}

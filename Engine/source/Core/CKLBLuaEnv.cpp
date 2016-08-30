@@ -237,6 +237,8 @@ CKLBLuaEnv::setupLuaEnv()
 	lua_setglobal(m_L, "addExtMsg");
 	lua_pushcfunction(m_L, &getGhostPlayerActivity);
 	lua_setglobal(m_L, "getGhostPlayerActivity");
+	lua_pushcfunction(m_L, &HASH_SHA1);
+	lua_setglobal(m_L, "HASH_SHA1");
     
 	// 全てに先駆けて、NULL を定義する
 	lua_pushlightuserdata(m_L, 0);
