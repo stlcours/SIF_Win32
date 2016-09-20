@@ -457,6 +457,12 @@ int GameEngineMain(int argc, _TCHAR* argv[])
 	klb_assert(bStdModuleExist, "The links of a system are insufficient.");
 
 	initHiResTimer();
+	
+	TIMECAPS tc;
+	if(timeGetDevCaps(&tc, sizeof(TIMECAPS)) != TIMERR_NOERROR)
+		klb_assertAlways("Timer resolution error");
+
+	unsigned int timer_resolution = min(max(tc.wPeriodMin, 1), tc.wPeriodMax);
 
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_RGB | GLUT_DEPTH);
@@ -615,7 +621,7 @@ int GameEngineMain(int argc, _TCHAR* argv[])
 	// create main window
 	hwnd = CreateWindowExA(0,
 		"GameEngineGL", "Playground", 
-		Window_Flags,
+		Window_Flags | WS_CLIPCHILDREN,
 		CW_USEDEFAULT, CW_USEDEFAULT, scrW, scrH,
 		NULL, NULL, hInstance, NULL );
 	
@@ -713,6 +719,8 @@ int GameEngineMain(int argc, _TCHAR* argv[])
 		else
 			DEBUG_PRINT("Warning: Frame limiter is not supported!");
 
+		timeBeginPeriod(timer_resolution);
+
 		while (!quit)
 		{
 			/* relay message queue messages to windowproc's */
@@ -745,20 +753,14 @@ int GameEngineMain(int argc, _TCHAR* argv[])
 				// If a Control (ex TextBox) is done, redraw them.
 				CWin32Widget::ReDrawControls();
 
-				/*if(frame_limit)
-				{
-					delta = frameTime - (GetTickCount() - newTime);
-
-					if(delta >= 0)
-						Sleep(3);
-				}*/
-
 				lastTime = newTime;
 			}
 		}
 	}
 
 	pfif.client().finishGame();
+
+	timeEndPeriod(timer_resolution);
 
 	SoundSystemExitFor_Win32();
 

@@ -183,9 +183,8 @@ CWin32Widget::redraw()
 	if(m_bMove) {
 		m_bMove = false;
 		MoveWindow(m_hWnd, m_x, m_y, m_width, m_height, true);
-	} else {
-		InvalidateRect(m_hWnd, NULL, FALSE);
 	}
+	InvalidateRect(m_hWnd, NULL, FALSE);
 	RedrawWindow(m_hWnd, NULL, 0, RDW_UPDATENOW);
 }
 
@@ -193,6 +192,7 @@ void
 CWin32Widget::ReDrawControls()
 {
 	CWin32Widget * pCtrl = m_pBegin;
+
 	while(pCtrl) {
 		pCtrl->redraw();
 		pCtrl = pCtrl->m_next;
@@ -252,7 +252,7 @@ CWin32TextWidget::create(IWidget::CONTROL type, int id, const char * caption,
 		return false;
 	case TEXTBOX:
 		{
-			hWnd = CreateWindow(
+			hWnd = CreateWindowEx(WS_EX_TOPMOST, 
 								TEXT("EDIT"),
 								caption,
 								WS_CHILD | WS_VISIBLE | WS_BORDER | ES_AUTOHSCROLL | ES_LEFT,
@@ -265,9 +265,9 @@ CWin32TextWidget::create(IWidget::CONTROL type, int id, const char * caption,
 		break;
 	case PASSWDBOX:
 		{
-			hWnd = CreateWindow(TEXT("EDIT"),
+			hWnd = CreateWindowEx(WS_EX_TOPMOST, TEXT("EDIT"),
 								caption,
-								WS_CHILD | WS_VISIBLE | WS_BORDER | ES_AUTOHSCROLL | ES_LEFT|ES_PASSWORD,
+								WS_CHILD | WS_VISIBLE | WS_BORDER | ES_AUTOHSCROLL | ES_LEFT | ES_PASSWORD,
 								x, y, width, height,
 								getPlatform().get_hWnd(),
 								(HMENU)(INT_PTR)m_uniqId,
@@ -389,20 +389,39 @@ CWin32TextWidget::msgCommand(HWND /*hWnd*/, UINT /*message*/, WPARAM wParam, LPA
 CWin32WebWidget::CWin32WebWidget(CWin32Platform * pParent) : CWin32Widget(pParent) {}
 CWin32WebWidget::~CWin32WebWidget() {}
 
-bool
-CWin32WebWidget::create(IWidget::CONTROL type, int id, const char * /*caption*/,
-							int x, int y, int width, int height,
-							const char * /*token*/, const char * /*region*/, const char * /*client*/,
-							const char * /*consumerKey*/, const char * /*applicationId*/, const char * /*userID*/)
-{
+#include "SIF_Win32.h"
+#include "CKLBDrawTask.h"
 
+void add_property(IWebBrowser2* wb, const char* key, const char* val)
+{
+	wchar_t key_multi[64];
+	size_t temp_len;
+	char* temp_val;
+	BSTR temp_key;
+	VARIANT temp_variant;
+
+	mbstowcs(key_multi, key, 64);
+	VariantInit(&temp_variant);
+	temp_len = strlen(val);
+	temp_val = new char[temp_len + 1];
+	temp_key = SysAllocString(key_multi);
+	temp_variant.vt = VT_BLOB;
+	temp_variant.pbVal = (BYTE*)temp_val;
+	wb->PutProperty(temp_key, temp_variant);
+}
+
+bool
+CWin32WebWidget::create(IWidget::CONTROL type, int id, const char * caption,
+							int x, int y, int width, int height,
+							const char * token, const char * region, const char * client,
+							const char * consumerKey, const char * applicationId, const char * userID)
+{
+	CKLBDrawResource& draw = CKLBDrawResource::getInstance();
 	HWND hWnd = 0;
-	void (*AtlAxWinInit)();
-	HRESULT (*AtlAxGetControl)(HWND,IUnknown **);
-	HMODULE hAtl = LoadLibrary("atl");
-	AtlAxWinInit = (void (*)())GetProcAddress(hAtl ,"AtlAxWinInit");
-	AtlAxGetControl = (HRESULT (*)(HWND, IUnknown **))GetProcAddress(hAtl, "AtlAxGetControl");
-	AtlAxWinInit();
+	int px;
+	int py;
+
+	draw.toPhisicalPosition(40, 96, px, py);
 
 	switch(type)
 	{
@@ -412,16 +431,34 @@ CWin32WebWidget::create(IWidget::CONTROL type, int id, const char * /*caption*/,
 	case WEBVIEW:
 	case WEBNOJUMP:
 		{
-			hWnd = 0;
+			//TODO
 			/*
-			CreateWindow("AtlAxWin", "Shell.Explorer.2",
-								WS_CHILD|WS_VISIBLE, x, y, width, height, 
-								getPlatform().get_hWnd(),
-								(HMENU)0, (HINSTANCE)GetModuleHandle(NULL), NULL);
-//			IUnknown * hUnknown;
-//			if(AtlAxGetControl(hWnd, &hUnknown) == S_OK) {
-				
-//			}
+			CoCreateInstance(CLSID_InternetExplorer, NULL, CLSCTX_LOCAL_SERVER, IID_IWebBrowser2, (void**)m_webView);
+			
+			if(m_webView)
+			{
+				hWnd = CreateWindowExA(
+					WS_EX_TOPMOST,
+					"STATIC",
+					caption,
+					WS_CHILD | WS_VISIBLE,
+					x, y, width, height,
+					getPlatform().get_hWnd(),
+					(HMENU)(INT_PTR)m_uniqId,
+					GetModuleHandle(NULL),
+					NULL);
+
+				// set headers
+				add_property(m_webView, "application_id", applicationId);
+				add_property(m_webView, "client_version", client);
+				add_property(m_webView, "consumerkey", consumerKey);
+				add_property(m_webView, "region", region);
+				add_property(m_webView, "token", token);
+				add_property(m_webView, "url", caption);
+				add_property(m_webView, "user_id", userID);
+
+
+			}
 			*/
 		}
 		break;
@@ -430,13 +467,11 @@ CWin32WebWidget::create(IWidget::CONTROL type, int id, const char * /*caption*/,
 }
 
 
-
-
 CWin32MovieWidget::CWin32MovieWidget(CWin32Platform * pParent) : CWin32Widget(pParent) {}
 CWin32MovieWidget::~CWin32MovieWidget() {}
 
 bool
-CWin32MovieWidget::create(IWidget::CONTROL type, int id, const char * /*caption*/,
+CWin32MovieWidget::create(IWidget::CONTROL type, int id, const char * caption,
 							int x, int y, int width, int height)
 {
 	HWND hWnd = 0;
@@ -449,16 +484,6 @@ CWin32MovieWidget::create(IWidget::CONTROL type, int id, const char * /*caption*
 	case MOVIEPLAYER:
 		{
 			hWnd = 0;
-					/*CreateWindow(TEXT("MovieArea"),
-								caption,
-								WS_CHILD | WS_VISIBLE | WS_BORDER | ES_AUTOHSCROLL | ES_LEFT,
-								x, y, width, height,
-								getPlatform().get_hWnd(),
-								(HMENU)(INT_PTR)id,
-								(HINSTANCE)GetModuleHandle(NULL),
-								0);
-								*/
-
 		}
 		break;
 	case BGMOVIEPLAYER:
@@ -476,7 +501,7 @@ CWin32ActivityIndicator::CWin32ActivityIndicator(CWin32Platform * pParent) : CWi
 CWin32ActivityIndicator::~CWin32ActivityIndicator() {}
 
 bool
-CWin32ActivityIndicator::create(IWidget::CONTROL type, int id, const char * /*caption*/,
+CWin32ActivityIndicator::create(IWidget::CONTROL type, int id, const char * caption,
 								int x, int y, int width, int height)
 {
 	HWND hWnd = 0;
@@ -489,16 +514,6 @@ CWin32ActivityIndicator::create(IWidget::CONTROL type, int id, const char * /*ca
 	case ACTIVITYINDICATOR:
 		{
 			hWnd = 0;
-					/*CreateWindow(TEXT("MovieArea"),
-								caption,
-								WS_CHILD | WS_VISIBLE | WS_BORDER | ES_AUTOHSCROLL | ES_LEFT,
-								x, y, width, height,
-								getPlatform().get_hWnd(),
-								(HMENU)(INT_PTR)id,
-								(HINSTANCE)GetModuleHandle(NULL),
-								0);
-								*/
-
 		}
 		break;
 	}
