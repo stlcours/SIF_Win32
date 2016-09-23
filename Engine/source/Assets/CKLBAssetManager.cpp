@@ -539,7 +539,7 @@ bool CKLBAssetManager::setAssetNotFound(const char* hand)
 
 bool CKLBAssetManager::setPlaceHolder(const char* asset)
 {
-	// TODO
+	placeholder_path = CKLBUtility::copyString(asset);
 	return true;
 }
 

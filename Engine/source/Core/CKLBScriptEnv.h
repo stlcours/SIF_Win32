@@ -137,6 +137,7 @@ public:
 	bool call_netAPI_callback		(const char* funcName, CKLBObjectScriptable* obj, int uniq, int msg, int status, CKLBJsonItem * pRoot);
 	void call_netAPI_versionUp		(const char* funcName, CKLBObjectScriptable* obj, const char* clientVer, const char* serverVer);
 
+	void call_Mdl					(const char* callback, const char* filename, const char* url);
 };
 
 #endif

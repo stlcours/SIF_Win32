@@ -409,3 +409,15 @@ void CKLBScriptEnv::call_netAPI_versionUp		(const char* funcName, CKLBObjectScri
 
 #endif
 #endif
+
+void CKLBScriptEnv::call_Mdl(const char* callback, const char* filename, const char* url)
+{
+	CLuaState& lua = CKLBLuaEnv::getInstance().getState();
+
+	(void)url;
+
+	if(filename == NULL)
+		lua.callback(callback, "PSPI", NULL, url, NULL, 0);
+	else
+		lua.callback(callback, "SSPI", filename, url, NULL, 1);
+}

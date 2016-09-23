@@ -55,6 +55,8 @@
 // Global Text rendering buffer.
 #include "CKLBTextTempBuffer.h"
 
+#include "DownloadQueue.h"
+
 CKLBGameApplication::CKLBGameApplication()
 : IClientRequest    ()
 , m_bootFile        (NULL)
@@ -170,6 +172,7 @@ CKLBGameApplication::frameFlip(u32 deltaT)
         // changePointingMatrix(m_origin, m_width, m_height);
         // changeScreenMatrix(m_origin, m_width, m_height);
     }
+	MicroDownload::MainLoop(deltaT);
 	bool bContinue = CKLBTaskMgr::getInstance().execute(deltaT);
 	if(m_reboot) {
 		finishGame();

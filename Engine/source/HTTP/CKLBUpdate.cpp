@@ -247,9 +247,10 @@ CKLBUpdate::initScript(CLuaState& lua)
 	// bool res = true;
 
 	int argc = lua.numArgs();
+	lua.print_stack();
 
 	// 引数チェック
-	if(argc < ARG_REQUIRE || argc > ARG_NUM) {
+	if(argc < ARG_REQUIRE || argc > 8) {
 		return false;
 	}
 

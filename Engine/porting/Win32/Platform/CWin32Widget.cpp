@@ -124,9 +124,11 @@ bool
 CWin32Widget::setText(const char * string)
 {
 	// 渡された文字列はutf8なので、OSのコントロールに渡す前に ShiftJISに変換する
-	const char * sjisStr = m_pPlatform->utf8toSJIS(string);
-	int result = SetWindowText(m_hWnd, (LPSTR)sjisStr);
-	delete [] sjisStr;
+	wchar_t temp[1024];
+	//const char * sjisStr = m_pPlatform->utf8toSJIS(string);
+	mbstowcs(temp, string, 1024);
+	int result = SetWindowTextW(m_hWnd, (LPWSTR)temp);
+	//delete [] sjisStr;
 	return (!result) ? false : true;
 }
 
@@ -243,7 +245,10 @@ bool
 CWin32TextWidget::create(IWidget::CONTROL type, int id, const char * caption,
 							int x, int y, int width, int height)
 {
+	wchar_t caption_wide[128];
 	HWND hWnd = 0;
+
+	mbstowcs(caption_wide, caption, 128);
 
 	switch(type)
 	{
@@ -252,9 +257,9 @@ CWin32TextWidget::create(IWidget::CONTROL type, int id, const char * caption,
 		return false;
 	case TEXTBOX:
 		{
-			hWnd = CreateWindowEx(WS_EX_TOPMOST, 
-								TEXT("EDIT"),
-								caption,
+			hWnd = CreateWindowExW(WS_EX_TOPMOST, 
+								L"EDIT",
+								caption_wide,
 								WS_CHILD | WS_VISIBLE | WS_BORDER | ES_AUTOHSCROLL | ES_LEFT,
 								x, y, width, height,
 								getPlatform().get_hWnd(),
@@ -265,8 +270,8 @@ CWin32TextWidget::create(IWidget::CONTROL type, int id, const char * caption,
 		break;
 	case PASSWDBOX:
 		{
-			hWnd = CreateWindowEx(WS_EX_TOPMOST, TEXT("EDIT"),
-								caption,
+			hWnd = CreateWindowExW(WS_EX_TOPMOST, L"EDIT",
+								caption_wide,
 								WS_CHILD | WS_VISIBLE | WS_BORDER | ES_AUTOHSCROLL | ES_LEFT | ES_PASSWORD,
 								x, y, width, height,
 								getPlatform().get_hWnd(),
@@ -276,7 +281,7 @@ CWin32TextWidget::create(IWidget::CONTROL type, int id, const char * caption,
 		}
 		break;
 	}
-    if(m_maxlen > 0) { SendMessage(hWnd, EM_SETLIMITTEXT, (WPARAM)m_maxlen, 0); }
+    if(m_maxlen > 0) { SendMessageW(hWnd, EM_SETLIMITTEXT, (WPARAM)m_maxlen, 0); }
 
 	return init(hWnd, id, x, y, width, height);
 }

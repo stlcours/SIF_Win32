@@ -319,6 +319,8 @@ CKLBUtility::readAsset(u8 * stream, u32 streamSize, u32 * handle, IKLBAssetPlugi
 	return pAsset;
 }
 
+#include "SIF_Win32.h"
+
 CKLBAsset *
 CKLBUtility::loadAsset(const char * asset, u32 * handle, IKLBAssetPlugin* plugIn, bool bSimple)
 {
@@ -329,7 +331,15 @@ CKLBUtility::loadAsset(const char * asset, u32 * handle, IKLBAssetPlugin* plugIn
 	pAsset = (CKLBAsset *)pAssetManager.loadAssetByFileName(asset, plugIn);
 
 	if(!pAsset) {
-		return NULL;
+		// Asset not found. Load placeholder if available
+		CKLBAbstractAsset* temp = pAssetManager.loadAssetByFileName(pAssetManager.placeholder_path);
+
+		if(temp == NULL)
+			return NULL;
+
+		*handle = CKLBDataHandler::allocateHandle(temp);
+
+		return dynamic_cast<CKLBTextureAsset*>(temp)->getImage(pAssetManager.placeholder_path + 8);
 	}
 	if (handle) {
 		*handle = CKLBDataHandler::allocateHandle(pAsset);

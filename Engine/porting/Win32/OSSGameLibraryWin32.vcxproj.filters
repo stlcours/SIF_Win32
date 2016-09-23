@@ -1927,5 +1927,8 @@
     <ClCompile Include="..\..\source\Core\honokamiku_decrypter.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\HTTP\DownloadQueue.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

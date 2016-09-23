@@ -987,6 +987,7 @@
     <ClCompile Include="..\..\source\HTTP\CKLBStoreService.cpp" />
     <ClCompile Include="..\..\source\HTTP\CKLBUpdate.cpp" />
     <ClCompile Include="..\..\source\HTTP\CUnZip.cpp" />
+    <ClCompile Include="..\..\source\HTTP\DownloadQueue.cpp" />
     <ClCompile Include="..\..\source\HTTP\MultithreadedNetwork.cpp" />
     <ClCompile Include="..\..\source\LuaLib\CKLBLuaConst.cpp" />
     <ClCompile Include="..\..\source\LuaLib\CKLBLuaLibAPP.cpp" />

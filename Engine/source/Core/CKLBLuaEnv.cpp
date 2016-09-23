@@ -969,7 +969,7 @@ void CKLBLuaEnv::call_assetNotFound(const char* a, const char* b)
 {
 	lua_State* L = m_L;
 
-	klb_assert(luaL_loadstring(L, "local arg={...}arg[1](arg[2],arg[2])") == 0, "loadstring error");
+	klb_assert(luaL_loadstring(L, "local arg={...}_G[arg[1]](arg[2],arg[2])") == 0, "loadstring error");
 	lua_pushstring(L, a);
 	lua_pushstring(L, b);
 
