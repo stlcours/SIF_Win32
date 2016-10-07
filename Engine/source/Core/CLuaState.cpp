@@ -150,7 +150,7 @@ bool
 CLuaState::call(int args, const char * func, int nresults)
 {
     // call stackを取れるようにtraceback函数をpushしpcallの第四引数を修正.
-
+	lock();
     int base = lua_gettop(m_L) - args;
     lua_pushcfunction(m_L, traceback);
     lua_insert(m_L, base);
@@ -177,6 +177,8 @@ CLuaState::call(int args, const char * func, int nresults)
         snprintf(buffer, buff_len, msg, errmsg, func);
 #endif // #if defined(_WIN32)
         CKLBLuaEnv::getInstance().errMsg(buffer);
+		DEBUG_PRINT("Lua error in %s", getScriptName());
+		unlock();
 		klb_assertAlways("%s", buffer);
         KLBDELETEA(buffer); // assert発生するとここまで来ない予感はする.
         return false;

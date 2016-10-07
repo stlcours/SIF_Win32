@@ -319,8 +319,6 @@ CKLBUtility::readAsset(u8 * stream, u32 streamSize, u32 * handle, IKLBAssetPlugi
 	return pAsset;
 }
 
-#include "SIF_Win32.h"
-
 CKLBAsset *
 CKLBUtility::loadAsset(const char * asset, u32 * handle, IKLBAssetPlugin* plugIn, bool bSimple)
 {

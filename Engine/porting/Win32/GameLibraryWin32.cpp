@@ -42,6 +42,8 @@
 #include "CKLBLuaEnv.h"
 #include "CKLBTouchPad.h"
 
+#include "TaskbarProgress.h"
+
 #define IS_TOUCH ((GetMessageExtraInfo() & 0xFFFFFF00) == 0xFF515700)
 
 // #pragma comment(lib, "GameLibraryWin32.lib")
@@ -676,6 +678,7 @@ int GameEngineMain(int argc, _TCHAR* argv[])
 	/* set as foreground window to give this app focus in case it doesn't have it */
 	SetForegroundWindow(hwnd);
 	ShowWindow(hwnd, is_maximized ? SW_SHOWMAXIMIZED : SW_SHOWNORMAL);
+	TaskbarProgress::Activate(hwnd);
 
 	glClearColor(1.0f, 0.7f, 0.2039f, 0.0f);
 	glDisable( GL_CULL_FACE );
@@ -774,6 +777,8 @@ int GameEngineMain(int argc, _TCHAR* argv[])
 	// End of COM
 	OleUninitialize();
 	CoUninitialize();
+
+	TaskbarProgress::Deactivate();
 
 	if(DestroyWindow (hwnd)) {
 		printf("DestroyWindow SUCCESS\n");

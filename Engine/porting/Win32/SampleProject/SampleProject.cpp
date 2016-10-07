@@ -43,8 +43,9 @@ namespace SIF_Win32
 	bool SingleCore = false;
 	bool CloseWindowAsBack = false;
 	bool AndroidMode = false;
-	bool ChikaIcon = false;
+	bool ChikaIcon = true;
 	bool KeepRunningOnError = false;
+	bool LuaStdin = false;
 }
 
 static HANDLE lock;

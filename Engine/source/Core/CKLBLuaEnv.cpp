@@ -26,6 +26,7 @@
 #include "KLBPlatformMetrics.h"
 #ifdef _WIN32
 #include <Windows.h>
+#include "SIF_Win32.h"
 
 #ifdef DEBUG_LUAEDIT
 #include "RemoteDebugger.hpp"
@@ -42,7 +43,7 @@ int PfGameService(lua_State* L)
 {
 	DEBUG_PRINT("PfGame_Service called");
 	CLuaState(L).print_stack();
-	lua_pushlstring(L, "impossible_feature_PfGame_Service", 0);
+	lua_pushstring(L, "impossible_feature_PfGame_Service");
 	return 1;
 }
 
@@ -109,6 +110,25 @@ int traceback (lua_State *L) {
   return 1;
 }
 
+extern "C" int pmain (lua_State *L);
+
+void* thread_tracking = NULL;
+
+int secondary_thread_lua(void* , void* x)
+{
+	char* argv[] = {"lua", NULL};
+	lua_State* L = (lua_State*)x;
+
+	lua_pushcfunction(L, pmain);
+	lua_pushinteger(L, 1);
+	lua_pushlightuserdata(L, argv);
+
+	int status = lua_resume(L, NULL, 2);
+
+	return status;
+}
+
+
 CKLBLuaEnv::CKLBLuaEnv()
 : m_L               (NULL)
 , m_nowFile         (NULL)
@@ -148,6 +168,12 @@ CKLBLuaEnv::finishLuaEnv()
 #ifdef DEBUG_LUAEDIT
 		StopLuaEditRemoteDebugger();
 #endif
+		if(SIF_Win32::LuaStdin)
+		{
+			lua_pushnil(m_L);
+			lua_setglobal(m_L, "__THREAD");
+			CPFInterface::getInstance().platform().breakThread(thread_tracking);
+		}
 		lua_close(m_L);
 		m_L = NULL;
 	}
@@ -281,6 +307,13 @@ CKLBLuaEnv::setupLuaEnv()
 #ifdef DEBUG_LUAEDIT
 	StartLuaEditRemoteDebugger(22001, m_L);
 #endif
+
+	if(SIF_Win32::LuaStdin)
+	{
+		lua_State* another_L = lua_newthread(m_L);
+		lua_setglobal(m_L, "__THREAD");
+		thread_tracking = CPFInterface::getInstance().platform().createThread(secondary_thread_lua, another_L);
+	}
 
     return true;
 }
@@ -967,11 +1000,7 @@ CKLBLuaEnv::cmdExit()
 
 void CKLBLuaEnv::call_assetNotFound(const char* a, const char* b)
 {
-	lua_State* L = m_L;
+	CLuaState lua(m_L);
 
-	klb_assert(luaL_loadstring(L, "local arg={...}_G[arg[1]](arg[2],arg[2])") == 0, "loadstring error");
-	lua_pushstring(L, a);
-	lua_pushstring(L, b);
-
-	klb_assert(lua_pcall(L, 2, 0, 0) == 0, "script error");
+	lua.callback(a, "SS", b + 8, b);
 }

@@ -1,7 +1,9 @@
 // Icon resource
 
+#ifndef DUMP_ICON
 #include <Windows.h>
 #include "SIF_Win32.h"
+#endif
 
 const char ic_launcher[] = {
     0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A, 0x00, 0x00, 0x00, 0x0D, 0x49, 0x48, 0x44, 0x52, 
@@ -8991,6 +8993,8 @@ const char Chika_16x16[] = {
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 };
 
+#ifndef DUMP_ICON
+
 inline HICON create_icon_wrapper(const char* icon_data, int icon_size)
 {
 	HICON out = NULL;
@@ -9015,3 +9019,5 @@ HICON create_icon_16x16()
 	const char* icon_target = SIF_Win32::ChikaIcon ? Chika_16x16 : Icon_16x16;
 	return create_icon_wrapper(icon_target, 16);
 }
+
+#endif

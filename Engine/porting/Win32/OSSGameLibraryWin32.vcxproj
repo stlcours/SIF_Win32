@@ -921,6 +921,7 @@
     <ClCompile Include="..\..\libs\lua\ltable.c" />
     <ClCompile Include="..\..\libs\lua\ltablib.c" />
     <ClCompile Include="..\..\libs\lua\ltm.c" />
+    <ClCompile Include="..\..\libs\lua\lua.c" />
     <ClCompile Include="..\..\libs\lua\lundump.c" />
     <ClCompile Include="..\..\libs\lua\lvm.c" />
     <ClCompile Include="..\..\libs\lua\lzio.c" />
@@ -970,12 +971,13 @@
     <ClCompile Include="..\..\source\Core\DebugTracker.cpp" />
     <ClCompile Include="..\..\source\Core\Dictionnary.cpp" />
     <ClCompile Include="..\..\source\Core\encryptFile.cpp" />
-    <ClCompile Include="..\..\source\Core\honokamiku_decrypter.c" />
+    <ClCompile Include="..\..\source\Core\HonokaMiku\EN_Decrypter.cc" />
+    <ClCompile Include="..\..\source\Core\HonokaMiku\Helper.cc" />
+    <ClCompile Include="..\..\source\Core\HonokaMiku\JP_Decrypter.cc" />
+    <ClCompile Include="..\..\source\Core\HonokaMiku\V1_Decrypter.cc" />
+    <ClCompile Include="..\..\source\Core\HonokaMiku\V2_Decrypter.cc" />
+    <ClCompile Include="..\..\source\Core\HonokaMiku\V3_Decrypter.cc" />
     <ClCompile Include="..\..\source\Core\ITmpFile.cpp" />
-    <ClCompile Include="..\..\source\Core\md5.c">
-      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)honokamiku_md5.obj</ObjectFileName>
-      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)honokamiku_md5.obj</ObjectFileName>
-    </ClCompile>
     <ClCompile Include="..\..\source\Database\CKLBDatabase.cpp" />
     <ClCompile Include="..\..\source\Database\CKLBLanguageDatabase.cpp" />
     <ClCompile Include="..\..\source\Database\CKLBLuaDB.cpp" />
@@ -1127,6 +1129,7 @@
     <ClCompile Include="Platform\CWin32TmpFile.cpp" />
     <ClCompile Include="Platform\CWin32Widget.cpp" />
     <ClCompile Include="Platform\CWin32WriteFileStream.cpp" />
+    <ClCompile Include="Platform\TaskbarProgress.cpp" />
     <ClCompile Include="Platform\Win32LuaLock.cpp" />
     <ClCompile Include="Platform\Win32TouchLib.cpp" />
     <ClCompile Include="stdafx.cpp">

@@ -11,4 +11,5 @@ namespace SIF_Win32
 	extern bool AndroidMode;
 	extern bool ChikaIcon;
 	extern bool KeepRunningOnError;
+	extern bool LuaStdin;
 }

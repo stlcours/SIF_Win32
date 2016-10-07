@@ -1921,14 +1921,32 @@
     <ClCompile Include="..\..\source\LuaLib\CryptoFunc.cpp">
       <Filter>Source Files\LuaLib\modules</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\Core\md5.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\Core\honokamiku_decrypter.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\source\HTTP\DownloadQueue.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Core\HonokaMiku\EN_Decrypter.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Core\HonokaMiku\Helper.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Core\HonokaMiku\JP_Decrypter.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Core\HonokaMiku\V1_Decrypter.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Core\HonokaMiku\V2_Decrypter.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Core\HonokaMiku\V3_Decrypter.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Platform\TaskbarProgress.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\lua\lua.c">
+      <Filter>libs\Lua</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

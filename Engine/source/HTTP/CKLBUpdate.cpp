@@ -13,9 +13,13 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 */
+#include "CPFInterface.h"
 #include "CKLBUpdate.h"
 #include "CKLBLuaEnv.h"
 #include "CKLBUtility.h"
+
+#include "CWin32Platform.h"
+#include "TaskbarProgress.h"
 
 /**
 	.lock file structure :
@@ -245,7 +249,6 @@ bool
 CKLBUpdate::initScript(CLuaState& lua)
 {
 	// bool res = true;
-
 	int argc = lua.numArgs();
 	lua.print_stack();
 
@@ -278,6 +281,9 @@ CKLBUpdate::initScript(CLuaState& lua)
 	m_callbackZIP		= CKLBUtility::copyString(callbackUnzip);
 	m_callbackFinish	= CKLBUtility::copyString(callbackFinish);
 	m_callbackError		= callbackError ? CKLBUtility::copyString(callbackError) : NULL;
+
+	TaskbarProgress::ProgressGreen();
+	TaskbarProgress::SetValue(0);
 
 	return regist(NULL, P_NORMAL);
 }
@@ -333,6 +339,8 @@ CKLBUpdate::die()
 void
 CKLBUpdate::exec_init_download(u32 /*deltaT*/)
 {
+	TaskbarProgress::SetValue(0, 100);
+
 	m_httpIF->reuse();
 	m_httpIF->setDownload(m_tmpPath);	// ダウンロードモードで使用する
 	m_httpIF->httpGET(m_zipURL, false);	// zip取得のrequestを投げる
@@ -372,6 +380,7 @@ CKLBUpdate::exec_download(u32 /*deltaT*/)
 				m_maxProgress = progress;
 				// Only perform callback here when progress is NOT complete.
 				if (!bResult) {
+					TaskbarProgress::ProgressGreen();
 					CKLBScriptEnv::getInstance().call_eventUpdateDownload(m_callbackDL, this, (double)progress, buf);
 				}
 			}
@@ -405,6 +414,8 @@ CKLBUpdate::exec_init_unzip(u32 /*deltaT*/)
 	m_unzip = KLBNEWC(CUpdateUnZip, (fullpath));
 
 	if (!m_unzip->getStatus()) {	// invalid zip file
+		TaskbarProgress::SetValue(100, 100);
+		TaskbarProgress::ProgressRed();
 		CKLBScriptEnv::getInstance().call_eventUpdateError(m_callbackError, this);
 		DEBUG_PRINT("[update] invalid zip file");
 		// do not change m_eStep, thus it will retry again as the download step do
@@ -414,6 +425,9 @@ CKLBUpdate::exec_init_unzip(u32 /*deltaT*/)
 	m_zipEntry   = m_unzip->numEntry();	// あらかじめエントリ数を取得しておく
 	m_extracting = false;
 	m_eStep      = S_UNZIP;
+
+	TaskbarProgress::ProgressGreen();
+	TaskbarProgress::SetValue(0, m_zipEntry);
 
 	m_thread = CPFInterface::getInstance().platform().createThread(threadFunc,this);
 }
@@ -461,6 +475,9 @@ CKLBUpdate::exec_complete(u32 /*deltaT*/)
 	// Delete Update State file.
 	m_eStep = S_FINISHED;
 	CPFInterface::getInstance().platform().removeTmpFile(gUpdateFile);
+
+	TaskbarProgress::ProgressGreen();
+	TaskbarProgress::SetValue(0);
 }
 
 void
@@ -468,4 +485,7 @@ CKLBUpdate::exec_finish(u32 /*deltaT*/)
 {
 	CKLBScriptEnv::getInstance().call_eventUpdateComplete(m_callbackFinish, this);
 	kill();
+
+	TaskbarProgress::ProgressGreen();
+	TaskbarProgress::SetValue(0);
 }

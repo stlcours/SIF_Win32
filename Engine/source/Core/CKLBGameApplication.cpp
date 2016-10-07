@@ -172,8 +172,8 @@ CKLBGameApplication::frameFlip(u32 deltaT)
         // changePointingMatrix(m_origin, m_width, m_height);
         // changeScreenMatrix(m_origin, m_width, m_height);
     }
-	MicroDownload::MainLoop(deltaT);
 	bool bContinue = CKLBTaskMgr::getInstance().execute(deltaT);
+	MicroDownload::MainLoop(deltaT);
 	if(m_reboot) {
 		finishGame();
 		initGame();

@@ -350,10 +350,6 @@ CKLBAssetManager::loadAssetByFileName(const char* fileName, IKLBAssetPlugin* plu
 				m_currentLoadingFile = NULL;
 				delete pStream;
 				if(!bResult || !pAsset) {
-					CKLBLuaEnv& x = CKLBLuaEnv::getInstance();
-
-					x.call_assetNotFound(notfound_handler, fileName);
-
 					return NULL;
 				}
 				return pAsset;
@@ -436,6 +432,13 @@ CKLBAssetManager::loadAsset(u8* stream, u32 streamSize, CKLBAbstractAsset** ppAs
 			if (pStream) {
 				bool result = loadAssetStream(pStream, ppAsset,0,useAsync);
 				delete pStream;	// DO NOT USE KLBDELETE : platform use "new"
+
+				if(result == false)
+				{
+					CKLBLuaEnv& x = CKLBLuaEnv::getInstance();
+					x.call_assetNotFound(notfound_handler, fileName);
+				}
+
 				return result;
 			} else {
 				noError = false;
@@ -539,6 +542,7 @@ bool CKLBAssetManager::setAssetNotFound(const char* hand)
 
 bool CKLBAssetManager::setPlaceHolder(const char* asset)
 {
+	KLBDELETEA(placeholder_path);
 	placeholder_path = CKLBUtility::copyString(asset);
 	return true;
 }

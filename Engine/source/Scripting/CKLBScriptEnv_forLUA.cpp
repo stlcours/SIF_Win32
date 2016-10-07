@@ -24,6 +24,8 @@
 #include "CLuaState.h"
 #include "CKLBLuaScript.h"
 
+#include "TaskbarProgress.h"
+
 CKLBScriptEnv::CKLBScriptEnv() {
 }
 
@@ -363,12 +365,18 @@ void CKLBScriptEnv::call_eventWorld			(const char* funcName, CKLBObjectScriptabl
 
 void CKLBScriptEnv::call_eventUpdateDownload(const char* funcName, CKLBObjectScriptable* obj, double progress, const char* progressStr) {
 	if (!funcName) { return; }
+
+	TaskbarProgress::SetValue(progress * 100);
+
 	CLuaState& lua = CKLBLuaEnv::getInstance().getState();
 	lua.callback(funcName,"PNS",obj,progress,progressStr);
 }
 
 void CKLBScriptEnv::call_eventUpdateZIP		(const char* funcName, CKLBObjectScriptable* obj, int progress, int total) {
 	if (!funcName) { return; }
+
+	TaskbarProgress::SetValue(progress);
+
 	CLuaState& lua = CKLBLuaEnv::getInstance().getState();
 	lua.callback(funcName, "PII", obj, progress, total);
 }
@@ -381,6 +389,9 @@ void CKLBScriptEnv::call_eventUpdateComplete(const char* funcName, CKLBObjectScr
 
 void CKLBScriptEnv::call_eventUpdateError(const char* funcName, CKLBObjectScriptable* obj) {
 	if (!funcName) { return; }
+
+	TaskbarProgress::ProgressRed();
+
 	CLuaState& lua = CKLBLuaEnv::getInstance().getState();
 	lua.callback(funcName, "P", obj);
 }
@@ -420,4 +431,7 @@ void CKLBScriptEnv::call_Mdl(const char* callback, const char* filename, const c
 		lua.callback(callback, "PSPI", NULL, url, NULL, 0);
 	else
 		lua.callback(callback, "SSPI", filename, url, NULL, 1);
+
+	luaL_loadstring(lua.m_L, "import(\"NowAssetLoading\").finish()");
+	DEBUG_PRINT("Mdl: lua_pcall returns %d", lua_pcall(lua.m_L, 0, 0, 0));
 }

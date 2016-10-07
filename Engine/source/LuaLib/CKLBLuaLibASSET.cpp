@@ -272,6 +272,7 @@ void CKLBLuaLibASSET::cmdGetAssetInfo(const char* asset_name, s32* pReturnImgWid
 int get_asset_path_if_not_found(lua_State* L)
 {
 	CLuaState lua(L);
+	IPlatformRequest& ir = CPFInterface::getInstance().platform();
 
 	lua.print_stack();
 
@@ -285,7 +286,36 @@ int get_asset_path_if_not_found(lua_State* L)
 	
 	sprintf(asset_newpath, "asset://%s", asset_path);
 
+	// Test asset path
+	{
+		char mp3_path[MAX_PATH];
+		const char* path;
+		bool temp;
+
+		if(false)
+		{
+			asset_ok:
+			delete[] path;
+			lua.retNil();
+			goto return_end;
+		}
+
+		if(path = ir.getFullPath(asset_newpath, &temp)) goto asset_ok;
+
+		sprintf(mp3_path, "%s.mp3", asset_newpath);
+
+		if(path = ir.getFullPath(mp3_path, &temp)) goto asset_ok;
+
+		memset(mp3_path, 0, 4);
+		sprintf(mp3_path, "%s.ogg", asset_newpath);
+
+		if(path = ir.getFullPath(mp3_path, &temp)) goto asset_ok;
+	}
+
 	lua.retString(asset_newpath);
+
+	return_end:
+	delete[] asset_newpath;
 
 	return 1;
 }

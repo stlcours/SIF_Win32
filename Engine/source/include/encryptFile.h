@@ -18,10 +18,7 @@
 
 #include "BaseType.h"
 #include "encryptUserContext.h"
-
-extern "C" {
-#include "honokamiku_decrypter.h"
-}
+#include "HonokaMiku/DecrypterContext.h"
 
 /*!
     @class  DecryptBaseClass
@@ -29,7 +26,7 @@ extern "C" {
  */
 class CDecryptBaseClass {
 public:
-	honokamiku_context m_dctx;
+	HonokaMiku::DecrypterContext* m_dctx;
 	bool		m_decrypt;
 	bool		m_useNew;
 	int			m_header_size;
@@ -37,6 +34,7 @@ private:
 	void		decrypt(void* ptr, u32 length);
 public:
 	CDecryptBaseClass();
+	~CDecryptBaseClass();
 	inline void decryptBlck(void* ptr, u32 length) {
 		if (m_decrypt) { decrypt(ptr, length); }
 	}

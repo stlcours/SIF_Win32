@@ -497,7 +497,7 @@ CKLBTaskMgr::execute(u32 deltaT)
 #endif
 		int task_processed_count = 0;
 
-        for(pTask = m_lstTask[i].begin; pTask && task_processed_count < 1024; pTask = pTask->m_pExeNext) {
+        for(pTask = m_lstTask[i].begin; pTask && task_processed_count < 4096; pTask = pTask->m_pExeNext) {
             m_currentTask = pTask;
 			task_processed_count++;
 
